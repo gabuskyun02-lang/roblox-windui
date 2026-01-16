@@ -191,16 +191,21 @@ function Code.New(Code, Title, Parent, Callback, UIScale)
     Creator.AddSignal(CopyButton.MouseButton1Click, function()
         if Callback then
             Callback()
-            local CheckIcon = Creator.Icon("check")
-            CopyButton.Button.ImageLabel.Image = CheckIcon[1]
-            CopyButton.Button.ImageLabel.ImageRectSize = CheckIcon[2].ImageRectSize
-            CopyButton.Button.ImageLabel.ImageRectOffset = CheckIcon[2].ImageRectPosition
+            local btnImg = CopyButton.Button:FindFirstChild("ImageLabel")
+            if btnImg then
+                local CheckIcon = Creator.Icon("check")
+                btnImg.Image = CheckIcon[1]
+                btnImg.ImageRectSize = CheckIcon[2].ImageRectSize
+                btnImg.ImageRectOffset = CheckIcon[2].ImageRectPosition
+            end
             
             task.wait(1)
-            local CopyIcon = Creator.Icon("copy")
-            CopyButton.Button.ImageLabel.Image = CopyIcon[1]
-            CopyButton.Button.ImageLabel.ImageRectSize = CopyIcon[2].ImageRectSize
-            CopyButton.Button.ImageLabel.ImageRectOffset = CopyIcon[2].ImageRectPosition
+            if btnImg then
+                local CopyIcon = Creator.Icon("copy")
+                btnImg.Image = CopyIcon[1]
+                btnImg.ImageRectSize = CopyIcon[2].ImageRectSize
+                btnImg.ImageRectOffset = CopyIcon[2].ImageRectPosition
+            end
         end
     end)
     return CodeModule

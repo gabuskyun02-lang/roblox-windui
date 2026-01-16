@@ -172,9 +172,11 @@ return function(Config)
             "ElementIcon"
         )
         if typeof(Element.Color) == "string" then 
-            ImageFrame.ImageLabel.ImageColor3 = GetTextColorForHSB(Color3.fromHex(Creator.Colors[Element.Color]))
+            local img = ImageFrame:FindFirstChild("ImageLabel")
+            if img then img.ImageColor3 = GetTextColorForHSB(Color3.fromHex(Creator.Colors[Element.Color])) end
         elseif typeof(Element.Color) == "Color3" then
-            ImageFrame.ImageLabel.ImageColor3 = GetTextColorForHSB(Element.Color)
+            local img = ImageFrame:FindFirstChild("ImageLabel")
+            if img then img.ImageColor3 = GetTextColorForHSB(Element.Color) end
         end
         
         ImageFrame.Size = UDim2.new(0,ImageSize,0,ImageSize)
@@ -290,8 +292,11 @@ return function(Config)
         false
     )
     LockedIcon.Size = UDim2.new(0,20,0,20)
-    LockedIcon.ImageLabel.ImageColor3 = Color3.new(1,1,1)
-    LockedIcon.ImageLabel.ImageTransparency = .4
+    local lockImg = LockedIcon:FindFirstChild("ImageLabel")
+    if lockImg then
+        lockImg.ImageColor3 = Color3.new(1,1,1)
+        lockImg.ImageTransparency = .4
+    end
     
     local LockedTitle = New("TextLabel", {
         Text = "Locked",
@@ -592,9 +597,11 @@ return function(Config)
             )
             
             if typeof(Element.Color) == "string" then 
-                ImageFrame.ImageLabel.ImageColor3 = GetTextColorForHSB(Color3.fromHex(Creator.Colors[Element.Color]))
+                local img = ImageFrame:FindFirstChild("ImageLabel")
+                if img then img.ImageColor3 = GetTextColorForHSB(Color3.fromHex(Creator.Colors[Element.Color])) end
             elseif typeof(Element.Color) == "Color3" then
-                ImageFrame.ImageLabel.ImageColor3 = GetTextColorForHSB(Element.Color)
+                local img = ImageFrame:FindFirstChild("ImageLabel")
+                if img then img.ImageColor3 = GetTextColorForHSB(Element.Color) end
             end
             
             ImageFrame.Visible = true
