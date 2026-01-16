@@ -12995,16 +12995,18 @@ if az and az.Main then
 local aA=az.Main:FindFirstChild"Background"
 if aA then
 ap.Tween(aA,0.2,{
-ImageTransparency=ay and 0.15 or 0
+ImageTransparency=ay and 0.2 or 0
 }):Play()
 end
 
 
-local aB=az.SideBarContainer
+if az.MainBar then
+local aB=az.MainBar:FindFirstChild"Background"
 if aB then
 ap.Tween(aB,0.2,{
-BackgroundTransparency=ay and 0.3 or 0
+ImageTransparency=ay and 0.85 or 0.95
 }):Play()
+end
 end
 end
 
