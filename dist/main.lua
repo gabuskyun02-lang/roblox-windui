@@ -5849,7 +5849,9 @@ af.UIElements.ButtonIcon.LayoutOrder=af.IconAlign=="Left"and-99999 or 99999
 af.UIElements.ButtonIcon.AnchorPoint=Vector2.new(1,0.5)
 af.UIElements.ButtonIcon.Position=UDim2.new(1,0,0.5,0)
 
+if af.UIElements.ButtonIcon:FindFirstChild"ImageLabel"then
 af.ButtonFrame:Colorize(af.UIElements.ButtonIcon.ImageLabel,"ImageColor3")
+end
 
 function af.Lock(ah)
 af.Locked=true
@@ -9736,13 +9738,15 @@ ap.IconThemed,
 "TabIcon"
 )
 as.Size=UDim2.new(0,16,0,16)
-if ap.IconColor then
+if ap.IconColor and as:FindFirstChild"ImageLabel"then
 as.ImageLabel.ImageColor3=ap.IconColor
 end
 if not ap.IconShape then
 as.Parent=ap.UIElements.Main.Frame
 ap.UIElements.Icon=as
+if as:FindFirstChild"ImageLabel"then
 as.ImageLabel.ImageTransparency=not ap.Locked and 0 or.7
+end
 ar=-18-(Window.UIPadding/2)
 ap.UIElements.Main.Frame.TextLabel.Size=UDim2.new(1,ar,0,0)
 elseif ap.IconColor then
@@ -9777,8 +9781,10 @@ Name="Outline"
 })
 as.AnchorPoint=Vector2.new(0.5,0.5)
 as.Position=UDim2.new(0.5,0,0.5,0)
+if as:FindFirstChild"ImageLabel"then
 as.ImageLabel.ImageTransparency=0
 as.ImageLabel.ImageColor3=af.GetTextColorForHSB(ap.IconColor,0.68)
+end
 ar=-28-(Window.UIPadding/2)
 ap.UIElements.Main.Frame.TextLabel.Size=UDim2.new(1,ar,0,0)
 end
@@ -9797,7 +9803,9 @@ true,
 ap.IconThemed
 )
 at.Size=UDim2.new(0,16,0,16)
+if at:FindFirstChild"ImageLabel"then
 at.ImageLabel.ImageTransparency=not ap.Locked and 0 or.7
+end
 ar=-30
 
 
@@ -10111,7 +10119,10 @@ aj(aq.UIElements.Main.Outline,0.15,{ImageTransparency=1}):Play()
 end
 aj(aq.UIElements.Main.Frame.TextLabel,0.15,{TextTransparency=0.3}):Play()
 if aq.UIElements.Icon and not aq.IconColor then
-aj(aq.UIElements.Icon.ImageLabel,0.15,{ImageTransparency=0.4}):Play()
+local ar=aq.UIElements.Icon:FindFirstChild"ImageLabel"
+if ar then
+aj(ar,0.15,{ImageTransparency=0.4}):Play()
+end
 end
 aq.Selected=false
 end
@@ -10122,7 +10133,10 @@ aj(am.Tabs[ao].UIElements.Main.Outline,0.15,{ImageTransparency=0.75}):Play()
 end
 aj(am.Tabs[ao].UIElements.Main.Frame.TextLabel,0.15,{TextTransparency=0}):Play()
 if am.Tabs[ao].UIElements.Icon and not am.Tabs[ao].IconColor then
-aj(am.Tabs[ao].UIElements.Icon.ImageLabel,0.15,{ImageTransparency=0.1}):Play()
+local ap=am.Tabs[ao].UIElements.Icon:FindFirstChild"ImageLabel"
+if ap then
+aj(ap,0.15,{ImageTransparency=0.1}):Play()
+end
 end
 am.Tabs[ao].Selected=true
 
