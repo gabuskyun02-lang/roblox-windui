@@ -13030,7 +13030,7 @@ end
 function ae.ToggleAcrylic(ax,ay)
 if ae.Window and ae.Window.AcrylicPaint and ae.Window.AcrylicPaint.Model then
 ae.Window.Acrylic=ay
-ae.Window.AcrylicPaint.Model.Transparency=ay and 0.98 or 1
+ae.Window.AcrylicPaint.Model.Transparency=ay and 0.90 or 1
 
 
 local az=ae.Window.UIElements
@@ -13048,7 +13048,7 @@ if az.MainBar then
 local aB=az.MainBar:FindFirstChild"Background"
 if aB then
 ap.Tween(aB,0.2,{
-ImageTransparency=ay and 0.3 or 0
+ImageTransparency=ay and 0.05 or 0
 }):Play()
 end
 end
