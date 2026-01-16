@@ -3249,7 +3249,6 @@ AcrylicPaint=a.load'r',
 }
 
 function ab.init()
-
 local ac=Instance.new"DepthOfFieldEffect"
 ac.FarIntensity=0
 ac.InFocusRadius=0.1
@@ -3258,13 +3257,16 @@ ac.NearIntensity=1
 local ad={}
 
 function ab.Enable()
-
-
+for ae,af in pairs(ad)do
+af.Enabled=false
+end
 ac.Parent=aa(game:GetService"Lighting")
 end
 
 function ab.Disable()
-
+for ae,af in pairs(ad)do
+af.Enabled=af.enabled
+end
 ac.Parent=nil
 end
 
@@ -3291,7 +3293,6 @@ ab.Enable()
 end
 
 return ab end function a.t()
-
 local aa={}
 
 local ab=a.load'c'
