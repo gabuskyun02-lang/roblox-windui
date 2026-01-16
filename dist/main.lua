@@ -2990,7 +2990,7 @@ Anchored=true,
 CanCollide=false,
 Locked=true,
 CastShadow=false,
-Transparency=0.9,
+Transparency=0.98,
 },{
 ac("SpecialMesh",{
 MeshType=Enum.MeshType.Brick,
@@ -13030,7 +13030,7 @@ end
 function ae.ToggleAcrylic(ax,ay)
 if ae.Window and ae.Window.AcrylicPaint and ae.Window.AcrylicPaint.Model then
 ae.Window.Acrylic=ay
-ae.Window.AcrylicPaint.Model.Transparency=ay and 0.85 or 1
+ae.Window.AcrylicPaint.Model.Transparency=ay and 0.98 or 1
 
 
 local az=ae.Window.UIElements
@@ -13039,7 +13039,7 @@ if az and az.Main then
 local aA=az.Main:FindFirstChild"Background"
 if aA then
 ap.Tween(aA,0.2,{
-ImageTransparency=ay and 0.2 or 0
+ImageTransparency=ay and 0.15 or 0
 }):Play()
 end
 
@@ -13048,7 +13048,7 @@ if az.MainBar then
 local aB=az.MainBar:FindFirstChild"Background"
 if aB then
 ap.Tween(aB,0.2,{
-ImageTransparency=ay and 0.85 or 0.95
+ImageTransparency=ay and 0.3 or 0
 }):Play()
 end
 end
