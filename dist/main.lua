@@ -5185,9 +5185,11 @@ not ag.Color and true or false,
 "ElementIcon"
 )
 if typeof(ag.Color)=="string"then
-am.ImageLabel.ImageColor3=GetTextColorForHSB(Color3.fromHex(aa.Colors[ag.Color]))
+local an=am:FindFirstChild"ImageLabel"
+if an then an.ImageColor3=GetTextColorForHSB(Color3.fromHex(aa.Colors[ag.Color]))end
 elseif typeof(ag.Color)=="Color3"then
-am.ImageLabel.ImageColor3=GetTextColorForHSB(ag.Color)
+local an=am:FindFirstChild"ImageLabel"
+if an then an.ImageColor3=GetTextColorForHSB(ag.Color)end
 end
 
 am.Size=UDim2.new(0,ah,0,ah)
@@ -5303,10 +5305,13 @@ af.Window.Folder,
 false
 )
 ap.Size=UDim2.new(0,20,0,20)
-ap.ImageLabel.ImageColor3=Color3.new(1,1,1)
-ap.ImageLabel.ImageTransparency=.4
+local aq=ap:FindFirstChild"ImageLabel"
+if aq then
+aq.ImageColor3=Color3.new(1,1,1)
+aq.ImageTransparency=.4
+end
 
-local aq=ab("TextLabel",{
+local ar=ab("TextLabel",{
 Text="Locked",
 TextSize=18,
 FontFace=Font.new(aa.Font,Enum.FontWeight.Medium),
@@ -5316,7 +5321,7 @@ TextColor3=Color3.new(1,1,1),
 TextTransparency=.05,
 })
 
-local ar=ab("Frame",{
+local as=ab("Frame",{
 Size=UDim2.new(1,ag.UIPadding*2,1,ag.UIPadding*2),
 BackgroundTransparency=1,
 AnchorPoint=Vector2.new(0.5,0.5),
@@ -5324,13 +5329,13 @@ Position=UDim2.new(0.5,0,0.5,0),
 ZIndex=9999999,
 })
 
-local as,at=ac(ag.UICorner,"Squircle",{
+local at,au=ac(ag.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=.25,
 ImageColor3=Color3.new(0,0,0),
 Visible=false,
 Active=false,
-Parent=ar,
+Parent=as,
 },{
 ab("UIListLayout",{
 FillDirection="Horizontal",
@@ -5338,34 +5343,17 @@ VerticalAlignment="Center",
 HorizontalAlignment="Center",
 Padding=UDim.new(0,8)
 }),
-ap,aq
+ap,ar
 },nil,true)
 
-local au,av=ac(ag.UICorner,"Squircle-Outline",{
+local av,aw=ac(ag.UICorner,"Squircle-Outline",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=1,
 Active=false,
 ThemeTag={
 ImageColor3="Text",
 },
-Parent=ar,
-},{
-ab("UIListLayout",{
-FillDirection="Horizontal",
-VerticalAlignment="Center",
-HorizontalAlignment="Center",
-Padding=UDim.new(0,8)
-}),
-},nil,true)
-
-local aw,ax=ac(ag.UICorner,"Squircle",{
-Size=UDim2.new(1,0,1,0),
-ImageTransparency=1,
-Active=false,
-ThemeTag={
-ImageColor3="Text",
-},
-Parent=ar,
+Parent=as,
 },{
 ab("UIListLayout",{
 FillDirection="Horizontal",
@@ -5375,15 +5363,32 @@ Padding=UDim.new(0,8)
 }),
 },nil,true)
 
-
-local ay,az=ac(ag.UICorner,"Squircle-Outline",{
+local ax,ay=ac(ag.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=1,
 Active=false,
 ThemeTag={
 ImageColor3="Text",
 },
-Parent=ar,
+Parent=as,
+},{
+ab("UIListLayout",{
+FillDirection="Horizontal",
+VerticalAlignment="Center",
+HorizontalAlignment="Center",
+Padding=UDim.new(0,8)
+}),
+},nil,true)
+
+
+local az,aA=ac(ag.UICorner,"Squircle-Outline",{
+Size=UDim2.new(1,0,1,0),
+ImageTransparency=1,
+Active=false,
+ThemeTag={
+ImageColor3="Text",
+},
+Parent=as,
 },{
 ab("UIListLayout",{
 FillDirection="Horizontal",
@@ -5408,14 +5413,14 @@ NumberSequenceKeypoint.new(1,1)
 }),
 },nil,true)
 
-local aA,aB=ac(ag.UICorner,"Squircle",{
+local aB,b=ac(ag.UICorner,"Squircle",{
 Size=UDim2.new(1,0,1,0),
 ImageTransparency=1,
 Active=false,
 ThemeTag={
 ImageColor3="Text",
 },
-Parent=ar,
+Parent=as,
 },{
 ab("UIGradient",{
 Name="HoverGradient",
@@ -5440,7 +5445,7 @@ Padding=UDim.new(0,8)
 }),
 },nil,true)
 
-local b,d=ac(ag.UICorner,"Squircle",{
+local d,f=ac(ag.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 ImageTransparency=ag.Color and.05 or.93,
@@ -5460,7 +5465,7 @@ and ag.Color
 )or nil
 },{
 ag.UIElements.Container,
-ar,
+as,
 ab("UIPadding",{
 PaddingTop=UDim.new(0,ag.UIPadding),
 PaddingLeft=UDim.new(0,ag.UIPadding),
@@ -5469,39 +5474,39 @@ PaddingBottom=UDim.new(0,ag.UIPadding),
 }),
 },true,true)
 
-ag.UIElements.Main=b
-ag.UIElements.Locked=as
+ag.UIElements.Main=d
+ag.UIElements.Locked=at
 
 if ag.Hover then
-aa.AddSignal(b.MouseEnter,function()
+aa.AddSignal(d.MouseEnter,function()
 if aj then
-ad(b,.12,{ImageTransparency=ag.Color and.15 or.9}):Play()
-ad(aA,.12,{ImageTransparency=.9}):Play()
-ad(ay,.12,{ImageTransparency=.8}):Play()
-aa.AddSignal(b.MouseMoved,function(f,g)
-aA.HoverGradient.Offset=Vector2.new(((f-b.AbsolutePosition.X)/b.AbsoluteSize.X)-0.5,0)
-ay.HoverGradient.Offset=Vector2.new(((f-b.AbsolutePosition.X)/b.AbsoluteSize.X)-0.5,0)
+ad(d,.12,{ImageTransparency=ag.Color and.15 or.9}):Play()
+ad(aB,.12,{ImageTransparency=.9}):Play()
+ad(az,.12,{ImageTransparency=.8}):Play()
+aa.AddSignal(d.MouseMoved,function(g,h)
+aB.HoverGradient.Offset=Vector2.new(((g-d.AbsolutePosition.X)/d.AbsoluteSize.X)-0.5,0)
+az.HoverGradient.Offset=Vector2.new(((g-d.AbsolutePosition.X)/d.AbsoluteSize.X)-0.5,0)
 end)
 end
 end)
-aa.AddSignal(b.InputEnded,function()
+aa.AddSignal(d.InputEnded,function()
 if aj then
-ad(b,.12,{ImageTransparency=ag.Color and.05 or.93}):Play()
-ad(aA,.12,{ImageTransparency=1}):Play()
-ad(ay,.12,{ImageTransparency=1}):Play()
+ad(d,.12,{ImageTransparency=ag.Color and.05 or.93}):Play()
+ad(aB,.12,{ImageTransparency=1}):Play()
+ad(az,.12,{ImageTransparency=1}):Play()
 end
 end)
 end
 
-function ag.SetTitle(f,g)
-ag.Title=g
-an.Text=g
+function ag.SetTitle(g,h)
+ag.Title=h
+an.Text=h
 end
 
-function ag.SetDesc(f,g)
-ag.Desc=g
-ao.Text=g or""
-if not g then
+function ag.SetDesc(g,h)
+ag.Desc=h
+ao.Text=h or""
+if not h then
 ao.Visible=false
 elseif not ao.Visible then
 ao.Visible=true
@@ -5509,9 +5514,9 @@ end
 end
 
 
-function ag.Colorize(f,g,h)
+function ag.Colorize(g,h,j)
 if ag.Color then
-g[h]=typeof(ag.Color)=="string"
+h[j]=typeof(ag.Color)=="string"
 and GetTextColorForHSB(Color3.fromHex(aa.Colors[ag.Color]))
 or typeof(ag.Color)=="Color3"
 and GetTextColorForHSB(ag.Color)
@@ -5538,18 +5543,18 @@ end
 
 
 
-function ag.SetThumbnail(f,g,h)
-ag.Thumbnail=g
-if h then
-ag.ThumbnailSize=h
-ai=h
+function ag.SetThumbnail(g,h,j)
+ag.Thumbnail=h
+if j then
+ag.ThumbnailSize=j
+ai=j
 end
 
 if al then
-if g then
+if h then
 al:Destroy()
 al=aa.Image(
-g,
+h,
 ag.Title,
 ag.UICorner-3,
 af.Window.Folder,
@@ -5559,17 +5564,17 @@ ag.IconThemed
 )
 al.Size=UDim2.new(1,0,0,ai)
 al.Parent=ag.UIElements.Container
-local j=ag.UIElements.Container:FindFirstChild"UIListLayout"
-if j then
+local l=ag.UIElements.Container:FindFirstChild"UIListLayout"
+if l then
 al.LayoutOrder=-1
 end
 else
 al.Visible=false
 end
 else
-if g then
+if h then
 al=aa.Image(
-g,
+h,
 ag.Title,
 ag.UICorner-3,
 af.Window.Folder,
@@ -5579,24 +5584,24 @@ ag.IconThemed
 )
 al.Size=UDim2.new(1,0,0,ai)
 al.Parent=ag.UIElements.Container
-local j=ag.UIElements.Container:FindFirstChild"UIListLayout"
-if j then
+local l=ag.UIElements.Container:FindFirstChild"UIListLayout"
+if l then
 al.LayoutOrder=-1
 end
 end
 end
 end
 
-function ag.SetImage(f,g,h)
-ag.Image=g
-if h then
-ag.ImageSize=h
-ah=h
+function ag.SetImage(g,h,j)
+ag.Image=h
+if j then
+ag.ImageSize=j
+ah=j
 end
 
-if g then
+if h then
 am=aa.Image(
-g,
+h,
 ag.Title,
 ag.UICorner-3,
 af.Window.Folder,
@@ -5605,9 +5610,11 @@ not ag.Color and true or false
 )
 
 if typeof(ag.Color)=="string"then
-am.ImageLabel.ImageColor3=GetTextColorForHSB(Color3.fromHex(aa.Colors[ag.Color]))
+local l=am:FindFirstChild"ImageLabel"
+if l then l.ImageColor3=GetTextColorForHSB(Color3.fromHex(aa.Colors[ag.Color]))end
 elseif typeof(ag.Color)=="Color3"then
-am.ImageLabel.ImageColor3=GetTextColorForHSB(ag.Color)
+local l=am:FindFirstChild"ImageLabel"
+if l then l.ImageColor3=GetTextColorForHSB(ag.Color)end
 end
 
 am.Visible=true
@@ -5625,26 +5632,26 @@ end
 ag.UIElements.Container.TitleFrame.TitleFrame.Size=UDim2.new(1,-ak,1,0)
 end
 
-function ag.Destroy(f)
-b:Destroy()
+function ag.Destroy(g)
+d:Destroy()
 end
 
 
-function ag.Lock(f,g)
+function ag.Lock(g,h)
 aj=false
-as.Active=true
-as.Visible=true
-aq.Text=g or"Locked"
+at.Active=true
+at.Visible=true
+ar.Text=h or"Locked"
 end
 
-function ag.Unlock(f)
+function ag.Unlock(g)
 aj=true
-as.Active=false
-as.Visible=false
+at.Active=false
+at.Visible=false
 end
 
-function ag.Highlight(f)
-local g=ab("UIGradient",{
+function ag.Highlight(g)
+local h=ab("UIGradient",{
 Color=ColorSequence.new{
 ColorSequenceKeypoint.new(0,Color3.new(1,1,1)),
 ColorSequenceKeypoint.new(0.5,Color3.new(1,1,1)),
@@ -5659,10 +5666,10 @@ NumberSequenceKeypoint.new(1,1)
 },
 Rotation=0,
 Offset=Vector2.new(-1,0),
-Parent=au
+Parent=av
 })
 
-local h=ab("UIGradient",{
+local j=ab("UIGradient",{
 Color=ColorSequence.new{
 ColorSequenceKeypoint.new(0,Color3.new(1,1,1)),
 ColorSequenceKeypoint.new(0.5,Color3.new(1,1,1)),
@@ -5677,47 +5684,47 @@ NumberSequenceKeypoint.new(1,1)
 },
 Rotation=0,
 Offset=Vector2.new(-1,0),
-Parent=aw
+Parent=ax
 })
 
-au.ImageTransparency=0.65
-aw.ImageTransparency=0.88
+av.ImageTransparency=0.65
+ax.ImageTransparency=0.88
 
-ad(g,0.75,{
+ad(h,0.75,{
 Offset=Vector2.new(1,0)
 }):Play()
 
-ad(h,0.75,{
+ad(j,0.75,{
 Offset=Vector2.new(1,0)
 }):Play()
 
 
 task.spawn(function()
 task.wait(.75)
-au.ImageTransparency=1
-aw.ImageTransparency=1
-g:Destroy()
+av.ImageTransparency=1
+ax.ImageTransparency=1
 h:Destroy()
+j:Destroy()
 end)
 end
 
 
-function ag.UpdateShape(f)
+function ag.UpdateShape(g)
 if af.Window.NewElements then
-local g
+local h
 if af.ParentConfig.ParentType=="Group"then
-g="Squircle"
+h="Squircle"
 else
-g=getElementPosition(f.Elements,ag.Index)
+h=getElementPosition(g.Elements,ag.Index)
 end
 
-if g and b then
-d:SetType(g)
-at:SetType(g)
-ax:SetType(g)
-av:SetType(g.."-Outline")
-aB:SetType(g)
-az:SetType(g.."-Outline")
+if h and d then
+f:SetType(h)
+au:SetType(h)
+ay:SetType(h)
+aw:SetType(h.."-Outline")
+b:SetType(h)
+aA:SetType(h.."-Outline")
 end
 end
 end
@@ -8145,16 +8152,21 @@ ap.Set(ak)
 ae.AddSignal(as.MouseButton1Click,function()
 if an then
 an()
-local au=ae.Icon"check"
-as.Button.ImageLabel.Image=au[1]
-as.Button.ImageLabel.ImageRectSize=au[2].ImageRectSize
-as.Button.ImageLabel.ImageRectOffset=au[2].ImageRectPosition
+local au=as.Button:FindFirstChild"ImageLabel"
+if au then
+local av=ae.Icon"check"
+au.Image=av[1]
+au.ImageRectSize=av[2].ImageRectSize
+au.ImageRectOffset=av[2].ImageRectPosition
+end
 
 task.wait(1)
+if au then
 local av=ae.Icon"copy"
-as.Button.ImageLabel.Image=av[1]
-as.Button.ImageLabel.ImageRectSize=av[2].ImageRectSize
-as.Button.ImageLabel.ImageRectOffset=av[2].ImageRectPosition
+au.Image=av[1]
+au.ImageRectSize=av[2].ImageRectSize
+au.ImageRectOffset=av[2].ImageRectPosition
+end
 end
 end)
 return ap
