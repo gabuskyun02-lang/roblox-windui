@@ -6213,22 +6213,22 @@ if ap then
 ad(an.Layer,0.06,{
 ImageTransparency=0,
 }):Play()
-
-
-
-ad(am.ImageLabel,0.06,{
+local aq=am:FindFirstChild"ImageLabel"
+if aq then
+ad(aq,0.06,{
 ImageTransparency=0,
 }):Play()
+end
 else
 ad(an.Layer,0.05,{
 ImageTransparency=1,
 }):Play()
-
-
-
-ad(am.ImageLabel,0.06,{
+local aq=am:FindFirstChild"ImageLabel"
+if aq then
+ad(aq,0.06,{
 ImageTransparency=1,
 }):Play()
+end
 end
 
 task.spawn(function()
