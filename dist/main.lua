@@ -2988,7 +2988,7 @@ Anchored=true,
 CanCollide=false,
 Locked=true,
 CastShadow=false,
-Transparency=0.98,
+Transparency=0.9,
 },{
 ac("SpecialMesh",{
 MeshType=Enum.MeshType.Brick,
@@ -11536,7 +11536,7 @@ at.WindUI.UIScaleObj,
 au.AcrylicPaint and au.AcrylicPaint.Frame or nil,
 aA,
 al.NewRoundFrame(au.UICorner,"Squircle",{
-ImageTransparency=1,
+ImageTransparency=0,
 Size=UDim2.new(1,0,1,-240),
 AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
@@ -12986,7 +12986,28 @@ end
 function ae.ToggleAcrylic(ax,ay)
 if ae.Window and ae.Window.AcrylicPaint and ae.Window.AcrylicPaint.Model then
 ae.Window.Acrylic=ay
-ae.Window.AcrylicPaint.Model.Transparency=ay and 0.98 or 1
+ae.Window.AcrylicPaint.Model.Transparency=ay and 0.85 or 1
+
+
+local az=ae.Window.UIElements
+if az and az.Main then
+
+local aA=az.Main:FindFirstChild"Background"
+if aA then
+ap.Tween(aA,0.2,{
+ImageTransparency=ay and 0.15 or 0
+}):Play()
+end
+
+
+local aB=az.SideBarContainer
+if aB then
+ap.Tween(aB,0.2,{
+BackgroundTransparency=ay and 0.3 or 0
+}):Play()
+end
+end
+
 if ay then
 as.Enable()
 else
