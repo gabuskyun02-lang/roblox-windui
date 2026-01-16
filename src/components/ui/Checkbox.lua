@@ -68,22 +68,22 @@ function Checkbox.New(Value, Icon, IconSize, Parent, Callback, Config)
             Tween(CheckboxFrame.Layer, 0.06, {
                 ImageTransparency = 0,
             }):Play()
-            --[[Tween(CheckboxFrame.Stroke, 0.06, {
-                ImageTransparency = 0.95,
-            }):Play()--]]
-            Tween(IconCheckboxFrame.ImageLabel, 0.06, {
-                ImageTransparency = 0,
-            }):Play()
+            local imgLabel = IconCheckboxFrame:FindFirstChild("ImageLabel")
+            if imgLabel then
+                Tween(imgLabel, 0.06, {
+                    ImageTransparency = 0,
+                }):Play()
+            end
         else
             Tween(CheckboxFrame.Layer, 0.05, {
                 ImageTransparency = 1,
             }):Play()
-            --[[Tween(CheckboxFrame.Stroke, 0.05, {
-                ImageTransparency = 1,
-            }):Play()--]]
-            Tween(IconCheckboxFrame.ImageLabel, 0.06, {
-                ImageTransparency = 1,
-            }):Play()
+            local imgLabel = IconCheckboxFrame:FindFirstChild("ImageLabel")
+            if imgLabel then
+                Tween(imgLabel, 0.06, {
+                    ImageTransparency = 1,
+                }):Play()
+            end
         end
 
         task.spawn(function()
