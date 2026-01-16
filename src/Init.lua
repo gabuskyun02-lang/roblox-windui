@@ -205,7 +205,7 @@ function WindUI:ToggleAcrylic(Value)
 				local panelBg = mainUI.MainBar:FindFirstChild("Background")
 				if panelBg then
 					Creator.Tween(panelBg, 0.2, {
-						ImageTransparency = Value and 0.05 or 0  -- Darker to match sidebar
+						ImageTransparency = Value and 0.9 or 1  -- Darker to match sidebar
 					}):Play()
 				end
 			end
