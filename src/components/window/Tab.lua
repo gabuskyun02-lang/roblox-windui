@@ -168,13 +168,15 @@ function TabModule.New(Config, UIScale)
             "TabIcon"
         )
         Icon.Size = UDim2.new(0,16,0,16)
-        if Tab.IconColor then
+        if Tab.IconColor and Icon:FindFirstChild("ImageLabel") then
             Icon.ImageLabel.ImageColor3 = Tab.IconColor
         end
         if not Tab.IconShape then
             Icon.Parent = Tab.UIElements.Main.Frame
             Tab.UIElements.Icon = Icon
-            Icon.ImageLabel.ImageTransparency = not Tab.Locked and 0 or .7
+            if Icon:FindFirstChild("ImageLabel") then
+                Icon.ImageLabel.ImageTransparency = not Tab.Locked and 0 or .7
+            end
             TextOffset = -16-2-(Window.UIPadding/2)
             Tab.UIElements.Main.Frame.TextLabel.Size = UDim2.new(1,TextOffset,0,0)
         elseif Tab.IconColor then
@@ -209,8 +211,10 @@ function TabModule.New(Config, UIScale)
             })
             Icon.AnchorPoint = Vector2.new(0.5,0.5)
             Icon.Position = UDim2.new(0.5,0,0.5,0)
-            Icon.ImageLabel.ImageTransparency = 0
-            Icon.ImageLabel.ImageColor3 = Creator.GetTextColorForHSB(Tab.IconColor, 0.68)
+            if Icon:FindFirstChild("ImageLabel") then
+                Icon.ImageLabel.ImageTransparency = 0
+                Icon.ImageLabel.ImageColor3 = Creator.GetTextColorForHSB(Tab.IconColor, 0.68)
+            end
             TextOffset = -26-2-(Window.UIPadding/2)
             Tab.UIElements.Main.Frame.TextLabel.Size = UDim2.new(1,TextOffset,0,0)
         end
@@ -229,7 +233,9 @@ function TabModule.New(Config, UIScale)
             Tab.IconThemed
         )
         Icon2.Size = UDim2.new(0,16,0,16)
-        Icon2.ImageLabel.ImageTransparency = not Tab.Locked and 0 or .7
+        if Icon2:FindFirstChild("ImageLabel") then
+            Icon2.ImageLabel.ImageTransparency = not Tab.Locked and 0 or .7
+        end
         TextOffset = -30
         
         --Icon2.Parent = Tab.UIElements.Main.Frame
@@ -543,7 +549,10 @@ function TabModule:SelectTab(TabIndex)
                 end
                 Tween(TabObject.UIElements.Main.Frame.TextLabel, 0.15, {TextTransparency = 0.3}):Play()
                 if TabObject.UIElements.Icon and not TabObject.IconColor then
-                    Tween(TabObject.UIElements.Icon.ImageLabel, 0.15, {ImageTransparency = 0.4}):Play()
+                    local imgLabel = TabObject.UIElements.Icon:FindFirstChild("ImageLabel")
+                    if imgLabel then
+                        Tween(imgLabel, 0.15, {ImageTransparency = 0.4}):Play()
+                    end
                 end
                 TabObject.Selected = false
             end
@@ -554,7 +563,10 @@ function TabModule:SelectTab(TabIndex)
         end
         Tween(TabModule.Tabs[TabIndex].UIElements.Main.Frame.TextLabel, 0.15, {TextTransparency = 0}):Play()
         if TabModule.Tabs[TabIndex].UIElements.Icon and not TabModule.Tabs[TabIndex].IconColor then
-            Tween(TabModule.Tabs[TabIndex].UIElements.Icon.ImageLabel, 0.15, {ImageTransparency = 0.1}):Play()
+            local imgLabel = TabModule.Tabs[TabIndex].UIElements.Icon:FindFirstChild("ImageLabel")
+            if imgLabel then
+                Tween(imgLabel, 0.15, {ImageTransparency = 0.1}):Play()
+            end
         end
         TabModule.Tabs[TabIndex].Selected = true
         

@@ -70,7 +70,9 @@ function Element:New(Config)
     Button.UIElements.ButtonIcon.AnchorPoint = Vector2.new(1,0.5)
     Button.UIElements.ButtonIcon.Position = UDim2.new(1,0,0.5,0)
     
-    Button.ButtonFrame:Colorize(Button.UIElements.ButtonIcon.ImageLabel, "ImageColor3")
+    if Button.UIElements.ButtonIcon:FindFirstChild("ImageLabel") then
+        Button.ButtonFrame:Colorize(Button.UIElements.ButtonIcon.ImageLabel, "ImageColor3")
+    end
     
     function Button:Lock()
         Button.Locked = true
