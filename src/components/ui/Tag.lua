@@ -33,7 +33,10 @@ function Tag:New(TagConfig, Parent)
         )
         
         TagIcon.Size = UDim2.new(0,TagModule.IconSize,0,TagModule.IconSize)
-        TagIcon.ImageLabel.ImageColor3 = typeof(TagModule.Color) == "Color3" and Creator.GetTextColorForHSB(TagModule.Color) or nil
+        local tagImg = TagIcon:FindFirstChild("ImageLabel")
+        if tagImg and typeof(TagModule.Color) == "Color3" then
+            tagImg.ImageColor3 = Creator.GetTextColorForHSB(TagModule.Color)
+        end
     end
     
     local TagTitle = New("TextLabel", {
@@ -56,7 +59,8 @@ function Tag:New(TagConfig, Parent)
         
         TagTitle.TextColor3 = Creator.GetTextColorForHSB(Creator.GetAverageColor(BackgroundGradient))
         if TagIcon then
-            TagIcon.ImageLabel.ImageColor3 = Creator.GetTextColorForHSB(Creator.GetAverageColor(BackgroundGradient))
+            local tagImg = TagIcon:FindFirstChild("ImageLabel")
+            if tagImg then tagImg.ImageColor3 = Creator.GetTextColorForHSB(Creator.GetAverageColor(BackgroundGradient)) end
         end
     end
     
@@ -118,7 +122,8 @@ function Tag:New(TagConfig, Parent)
             end
             Tween(TagTitle, .06, { TextColor3 = Creator.GetTextColorForHSB(color) }):Play()
             if TagIcon then
-                Tween(TagIcon.ImageLabel, .06, { ImageColor3 = Creator.GetTextColorForHSB(color) }):Play()
+                local tagImg = TagIcon:FindFirstChild("ImageLabel")
+                if tagImg then Tween(tagImg, .06, { ImageColor3 = Creator.GetTextColorForHSB(color) }):Play() end
             end
             Tween(TagFrame, .06, { ImageColor3 = color }):Play()
         end
@@ -143,9 +148,11 @@ function Tag:New(TagConfig, Parent)
             TagIcon.Parent = TagFrame
             
             if typeof(TagModule.Color) == "Color3" then
-                TagIcon.ImageLabel.ImageColor3 = Creator.GetTextColorForHSB(TagModule.Color)
+                local tagImg = TagIcon:FindFirstChild("ImageLabel")
+                if tagImg then tagImg.ImageColor3 = Creator.GetTextColorForHSB(TagModule.Color) end
             elseif typeof(TagModule.Color) == "table" then
-                TagIcon.ImageLabel.ImageColor3 = Creator.GetTextColorForHSB(Creator.GetAverageColor(BackgroundGradient))
+                local tagImg = TagIcon:FindFirstChild("ImageLabel")
+                if tagImg then tagImg.ImageColor3 = Creator.GetTextColorForHSB(Creator.GetAverageColor(BackgroundGradient)) end
             end
         else
             if TagIcon then

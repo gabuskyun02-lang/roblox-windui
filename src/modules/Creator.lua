@@ -698,7 +698,8 @@ function Creator.Image(Img, Name, Corner, Folder, Type, IsThemeTag, Themed, Them
                 
                 local assetSuccess, asset = pcall(getcustomasset, FileName)
                 if assetSuccess then
-                    ImageFrame.ImageLabel.Image = asset
+                    local imgLabel = ImageFrame:FindFirstChild("ImageLabel")
+                    if imgLabel then imgLabel.Image = asset end
                 else
                     warn(string.format("[ WindUI.Creator ] Failed to load custom asset '%s': %s", FileName, tostring(asset)))
                     ImageFrame:Destroy()
@@ -715,7 +716,8 @@ function Creator.Image(Img, Name, Corner, Folder, Type, IsThemeTag, Themed, Them
     elseif Img == "" then
         ImageFrame.Visible = false
     else
-        ImageFrame.ImageLabel.Image = Img
+        local imgLabel = ImageFrame:FindFirstChild("ImageLabel")
+        if imgLabel then imgLabel.Image = Img end
     end
     
     return ImageFrame

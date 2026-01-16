@@ -457,7 +457,8 @@ return function(Config)
         function Window.User:SetAnonymous(v)
             if v ~= false then v = true end
             Window.User.Anonymous = v
-            UserIcon.UserIcon.ImageLabel.Image = GetUserThumb()
+            local userImg = UserIcon.UserIcon:FindFirstChild("ImageLabel")
+            if userImg then userImg.Image = GetUserThumb() end
             UserIcon.UserIcon.Frame.DisplayName.Text = v and "Anonymous" or Players.LocalPlayer.DisplayName
             UserIcon.UserIcon.Frame.UserName.Text = v and "anonymous" or Players.LocalPlayer.Name
         end
@@ -1049,7 +1050,8 @@ return function(Config)
     
     
     function Window:SetBackgroundImage(id)
-        Window.UIElements.Main.Background.ImageLabel.Image = id
+        local bgImg = Window.UIElements.Main.Background:FindFirstChild("ImageLabel")
+        if bgImg then bgImg.Image = id end
     end
     function Window:SetBackgroundImageTransparency(v)
         if BGImage and BGImage:IsA("ImageLabel") then

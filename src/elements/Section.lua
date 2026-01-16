@@ -263,29 +263,31 @@ function Element:New(Config)
         function Section:Open(IsNotAnim)
             if Section.Expandable then
                 Section.Opened = true
+                local chevImg = ChevronIconFrame:FindFirstChild("ImageLabel")
                 if IsNotAnim then
                     Main.Size = UDim2.new(Main.Size.X.Scale,Main.Size.X.Offset,0, (Main.Top.AbsoluteSize.Y)/Config.UIScale + (Main.Content.AbsoluteSize.Y/Config.UIScale))
-                    ChevronIconFrame.ImageLabel.Rotation = 180
+                    if chevImg then chevImg.Rotation = 180 end
                 else
                     Tween(Main, 0.33, {
                         Size = UDim2.new(Main.Size.X.Scale,Main.Size.X.Offset,0, (Main.Top.AbsoluteSize.Y)/Config.UIScale + (Main.Content.AbsoluteSize.Y/Config.UIScale))
                     }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
     
-                    Tween(ChevronIconFrame.ImageLabel, 0.2, {Rotation = 180}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+                    if chevImg then Tween(chevImg, 0.2, {Rotation = 180}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play() end
                 end
             end
         end
         function Section:Close(IsNotAnim)
             if Section.Expandable then
                 Section.Opened = false
+                local chevImg = ChevronIconFrame:FindFirstChild("ImageLabel")
                 if IsNotAnim then
                     Main.Size = UDim2.new(Main.Size.X.Scale,Main.Size.X.Offset,0, (Main.Top.AbsoluteSize.Y/Config.UIScale))
-                    ChevronIconFrame.ImageLabel.Rotation = 0
+                    if chevImg then chevImg.Rotation = 0 end
                 else
                     Tween(Main, 0.26, {
                         Size = UDim2.new(Main.Size.X.Scale,Main.Size.X.Offset,0, (Main.Top.AbsoluteSize.Y/Config.UIScale))
                     }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-                    Tween(ChevronIconFrame.ImageLabel, 0.2, {Rotation = 0}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+                    if chevImg then Tween(chevImg, 0.2, {Rotation = 0}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play() end
                 end
             end
         end
