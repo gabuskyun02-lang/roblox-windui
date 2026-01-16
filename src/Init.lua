@@ -196,16 +196,18 @@ function WindUI:ToggleAcrylic(Value)
 			local bg = mainUI.Main:FindFirstChild("Background")
 			if bg then
 				Creator.Tween(bg, 0.2, {
-					ImageTransparency = Value and 0.15 or 0
+					ImageTransparency = Value and 0.2 or 0
 				}):Play()
 			end
 			
-			-- Adjust sidebar transparency for glassmorphism
-			local sidebar = mainUI.SideBarContainer
-			if sidebar then
-				Creator.Tween(sidebar, 0.2, {
-					BackgroundTransparency = Value and 0.3 or 0
-				}):Play()
+			-- Adjust main content panel background
+			if mainUI.MainBar then
+				local panelBg = mainUI.MainBar:FindFirstChild("Background")
+				if panelBg then
+					Creator.Tween(panelBg, 0.2, {
+						ImageTransparency = Value and 0.85 or 0.95
+					}):Play()
+				end
 			end
 		end
 		
