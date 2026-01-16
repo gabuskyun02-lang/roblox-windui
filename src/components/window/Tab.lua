@@ -168,14 +168,16 @@ function TabModule.New(Config, UIScale)
             "TabIcon"
         )
         Icon.Size = UDim2.new(0,16,0,16)
-        if Tab.IconColor and Icon:FindFirstChild("ImageLabel") then
-            Icon.ImageLabel.ImageColor3 = Tab.IconColor
+        if Tab.IconColor then
+            local iconImg = Icon:FindFirstChild("ImageLabel")
+            if iconImg then iconImg.ImageColor3 = Tab.IconColor end
         end
         if not Tab.IconShape then
             Icon.Parent = Tab.UIElements.Main.Frame
             Tab.UIElements.Icon = Icon
-            if Icon:FindFirstChild("ImageLabel") then
-                Icon.ImageLabel.ImageTransparency = not Tab.Locked and 0 or .7
+            local iconImg = Icon:FindFirstChild("ImageLabel")
+            if iconImg then
+                iconImg.ImageTransparency = not Tab.Locked and 0 or .7
             end
             TextOffset = -16-2-(Window.UIPadding/2)
             Tab.UIElements.Main.Frame.TextLabel.Size = UDim2.new(1,TextOffset,0,0)
@@ -211,9 +213,10 @@ function TabModule.New(Config, UIScale)
             })
             Icon.AnchorPoint = Vector2.new(0.5,0.5)
             Icon.Position = UDim2.new(0.5,0,0.5,0)
-            if Icon:FindFirstChild("ImageLabel") then
-                Icon.ImageLabel.ImageTransparency = 0
-                Icon.ImageLabel.ImageColor3 = Creator.GetTextColorForHSB(Tab.IconColor, 0.68)
+            local iconImg = Icon:FindFirstChild("ImageLabel")
+            if iconImg then
+                iconImg.ImageTransparency = 0
+                iconImg.ImageColor3 = Creator.GetTextColorForHSB(Tab.IconColor, 0.68)
             end
             TextOffset = -26-2-(Window.UIPadding/2)
             Tab.UIElements.Main.Frame.TextLabel.Size = UDim2.new(1,TextOffset,0,0)
@@ -233,8 +236,9 @@ function TabModule.New(Config, UIScale)
             Tab.IconThemed
         )
         Icon2.Size = UDim2.new(0,16,0,16)
-        if Icon2:FindFirstChild("ImageLabel") then
-            Icon2.ImageLabel.ImageTransparency = not Tab.Locked and 0 or .7
+        local icon2Img = Icon2:FindFirstChild("ImageLabel")
+        if icon2Img then
+            icon2Img.ImageTransparency = not Tab.Locked and 0 or .7
         end
         TextOffset = -30
         

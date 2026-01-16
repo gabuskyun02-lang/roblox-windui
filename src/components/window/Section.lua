@@ -35,8 +35,9 @@ function Section.New(SectionConfig, Parent, Folder, UIScale, Window)
         
         IconFrame.Size = UDim2.new(0,SectionModule.IconSize,0,SectionModule.IconSize)
         -- ImageLabel may not exist if using lucide icons (replaced with IconFrame)
-        if IconFrame:FindFirstChild("ImageLabel") then
-            IconFrame.ImageLabel.ImageTransparency = .25
+        local iconImg = IconFrame:FindFirstChild("ImageLabel")
+        if iconImg then
+            iconImg.ImageTransparency = .25
         end
     end
     
