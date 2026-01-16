@@ -2988,7 +2988,7 @@ Anchored=true,
 CanCollide=false,
 Locked=true,
 CastShadow=false,
-Transparency=0.98,
+Transparency=0.9,
 },{
 ac("SpecialMesh",{
 MeshType=Enum.MeshType.Brick,
@@ -3252,22 +3252,19 @@ function ab.init()
 
 local ac=Instance.new"DepthOfFieldEffect"
 ac.FarIntensity=0
-ac.InFocusRadius=10
-ac.NearIntensity=0.3
+ac.InFocusRadius=0.1
+ac.NearIntensity=1
 
 local ad={}
 
 function ab.Enable()
-for ae,af in pairs(ad)do
-af.Enabled=false
-end
+
+
 ac.Parent=aa(game:GetService"Lighting")
 end
 
 function ab.Disable()
-for ae,af in pairs(ad)do
-af.Enabled=af.enabled
-end
+
 ac.Parent=nil
 end
 
