@@ -41,8 +41,8 @@ return function(Config)
         
         Size = Config.Size,
         
-        MinSize = Config.MinSize or Vector2.new(480, 320),
-        MaxSize = Config.MaxSize or Vector2.new(750, 520),
+        MinSize = Config.MinSize or Vector2.new(400, 280),
+        MaxSize = Config.MaxSize or Vector2.new(1200, 800),
     
         TopBarButtonIconSize = Config.TopBarButtonIconSize ,
         

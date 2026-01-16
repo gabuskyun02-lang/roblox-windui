@@ -34,7 +34,10 @@ function Section.New(SectionConfig, Parent, Folder, UIScale, Window)
         )
         
         IconFrame.Size = UDim2.new(0,SectionModule.IconSize,0,SectionModule.IconSize)
-        IconFrame.ImageLabel.ImageTransparency = .25
+        -- ImageLabel may not exist if using lucide icons (replaced with IconFrame)
+        if IconFrame:FindFirstChild("ImageLabel") then
+            IconFrame.ImageLabel.ImageTransparency = .25
+        end
     end
     
     local ChevronIconFrame = New("Frame", {
