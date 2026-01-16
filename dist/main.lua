@@ -2988,7 +2988,7 @@ Anchored=true,
 CanCollide=false,
 Locked=true,
 CastShadow=false,
-Transparency=0.9,
+Transparency=0.98,
 },{
 ac("SpecialMesh",{
 MeshType=Enum.MeshType.Brick,
@@ -3250,42 +3250,47 @@ AcrylicPaint=a.load'r',
 
 function ab.init()
 
+local ac=Instance.new"DepthOfFieldEffect"
+ac.FarIntensity=0
+ac.InFocusRadius=10
+ac.NearIntensity=0.3
 
-
-
-
-
-
-
-local ac={}
+local ad={}
 
 function ab.Enable()
-
+for ae,af in pairs(ad)do
+af.Enabled=false
+end
+ac.Parent=aa(game:GetService"Lighting")
 end
 
 function ab.Disable()
-
+for ae,af in pairs(ad)do
+af.Enabled=af.enabled
+end
+ac.Parent=nil
 end
 
 local function registerDefaults()
-local function register(ad)
-if ad:IsA"DepthOfFieldEffect"then
-ac[ad]={enabled=ad.Enabled}
+local function register(ae)
+if ae:IsA"DepthOfFieldEffect"then
+ad[ae]={enabled=ae.Enabled}
 end
 end
 
-for ad,ae in pairs(aa(game:GetService"Lighting"):GetChildren())do
-register(ae)
+for ae,af in pairs(aa(game:GetService"Lighting"):GetChildren())do
+register(af)
 end
 
 if aa(game:GetService"Workspace").CurrentCamera then
-for ad,ae in pairs(aa(game:GetService"Workspace").CurrentCamera:GetChildren())do
-register(ae)
+for ae,af in pairs(aa(game:GetService"Workspace").CurrentCamera:GetChildren())do
+register(af)
 end
 end
 end
 
 registerDefaults()
+ab.Enable()
 end
 
 return ab end function a.t()
