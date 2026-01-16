@@ -837,9 +837,12 @@ return function(Config)
         IconFrame.Size = Window.Topbar.ButtonsType == "Default" and UDim2.new(0,IconSize or Window.TopBarButtonIconSize,0,IconSize or Window.TopBarButtonIconSize) or UDim2.new(0,0,0,0)
         IconFrame.AnchorPoint = Vector2.new(0.5,0.5)
         IconFrame.Position = UDim2.new(0.5,0,0.5,0)
-        IconFrame.ImageLabel.ImageTransparency = Window.Topbar.ButtonsType == "Default" and 0 or 1
-        if Window.Topbar.ButtonsType ~= "Default" then
-            IconFrame.ImageLabel.ImageColor3 = Creator.GetTextColorForHSB(Color)
+        local iconImg = IconFrame:FindFirstChild("ImageLabel")
+        if iconImg then
+            iconImg.ImageTransparency = Window.Topbar.ButtonsType == "Default" and 0 or 1
+            if Window.Topbar.ButtonsType ~= "Default" then
+                iconImg.ImageColor3 = Creator.GetTextColorForHSB(Color)
+            end
         end
         
         local Button = Creator.NewRoundFrame(Window.Topbar.ButtonsType == "Default" and Window.UICorner-(Window.UIPadding/2) or 999, "Squircle", {
@@ -907,7 +910,7 @@ return function(Config)
                 --Tween(IconFrame.ImageLabel, .15, {ImageTransparency = 0}):Play()
             else
                 --Tween(Button, .1, {Size = UDim2.new(0,14+8,0,14+8)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-                Tween(IconFrame.ImageLabel, .1, {ImageTransparency = 0}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+                if iconImg then Tween(iconImg, .1, {ImageTransparency = 0}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play() end
                 Tween(IconFrame, .1, {Size = UDim2.new(0,IconSize or Window.TopBarButtonIconSize,0,IconSize or Window.TopBarButtonIconSize)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
             end
         end)
@@ -918,7 +921,7 @@ return function(Config)
                 --Tween(IconFrame.ImageLabel, .1, {ImageTransparency = .2}):Play()
             else
                 --Tween(Button, .1, {Size = UDim2.new(0,14,0,14)}, Enum.EasingStyle.Quint, Enum.EasingDirection.InOut):Play()
-                Tween(IconFrame.ImageLabel, .1, {ImageTransparency = 1}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+                if iconImg then Tween(iconImg, .1, {ImageTransparency = 1}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play() end
                 Tween(IconFrame, .1, {Size = UDim2.new(0,0,0,0)}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
             end
         end)

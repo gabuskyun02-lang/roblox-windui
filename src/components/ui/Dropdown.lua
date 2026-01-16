@@ -198,7 +198,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                     Tween(tab.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = 1}):Play()
                     Tween(tab.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = 0.6}):Play()
                     if tab.UIElements.TabIcon then
-                        Tween(tab.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = 0.6}):Play()
+                        local img = tab.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                        if img then Tween(img, 0.1, {ImageTransparency = 0.6}):Play() end
                     end
                     
                     tab.UIElements.TabItem.Active = false
@@ -209,14 +210,16 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                         Tween(tab.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = 0.75}):Play()
                         Tween(tab.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = 0}):Play()
                         if tab.UIElements.TabIcon then
-                            Tween(tab.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = 0}):Play()
+                            local img = tab.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                            if img then Tween(img, 0.1, {ImageTransparency = 0}):Play() end
                         end
                     else
                         Tween(tab.UIElements.TabItem, 0.1, {ImageTransparency = 1}):Play()
                         Tween(tab.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = 1}):Play()
                         Tween(tab.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = Type == "Dropdown" and 0.4 or 0.05}):Play()
                         if tab.UIElements.TabIcon then
-                            Tween(tab.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = Type == "Dropdown" and 0.2 or 0}):Play()
+                            local img = tab.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                            if img then Tween(img, 0.1, {ImageTransparency = Type == "Dropdown" and 0.2 or 0}):Play() end
                         end
                     end
                     
@@ -278,7 +281,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                         true
                     )
                     TabIcon.Size = UDim2.new(0,TabMain.IconSize or Element.TabIcon,0,TabMain.IconSize or Element.TabIcon)
-                    TabIcon.ImageLabel.ImageTransparency = Type == "Dropdown" and .2 or 0
+                    local img = TabIcon:FindFirstChild("ImageLabel")
+                    if img then img.ImageTransparency = Type == "Dropdown" and .2 or 0 end
                     TabMain.UIElements.TabIcon = TabIcon
                 end
                 TabMain.UIElements.TabItem = Creator.NewRoundFrame(Element.MenuCorner - Element.MenuPadding, "Squircle", {
@@ -380,7 +384,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                 if TabMain.Locked then
                     TabMain.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency = 0.6
                     if TabMain.UIElements.TabIcon then
-                        TabMain.UIElements.TabIcon.ImageLabel.ImageTransparency = 0.6
+                        local img = TabMain.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                        if img then img.ImageTransparency = 0.6 end
                     end
                 end
 
@@ -416,7 +421,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                     TabMain.UIElements.TabItem.Highlight.ImageTransparency = .75
                     TabMain.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency = 0
                     if TabMain.UIElements.TabIcon then
-                        TabMain.UIElements.TabIcon.ImageLabel.ImageTransparency = 0
+                        local img = TabMain.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                        if img then img.ImageTransparency = 0 end
                     end
                 end
                 
@@ -435,7 +441,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                                 Tween(TabMain.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = .75}):Play()
                                 Tween(TabMain.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = 0}):Play()
                                 if TabMain.UIElements.TabIcon then
-                                    Tween(TabMain.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = 0}):Play()
+                                    local img = TabMain.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                                    if img then Tween(img, 0.1, {ImageTransparency = 0}):Play() end
                                 end
                                 table.insert(Dropdown.Value, TabMain.Original)
                             else
@@ -447,7 +454,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                                 Tween(TabMain.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = 1}):Play()
                                 Tween(TabMain.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = .4}):Play()
                                 if TabMain.UIElements.TabIcon then
-                                    Tween(TabMain.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = .2}):Play()
+                                    local img = TabMain.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                                    if img then Tween(img, 0.1, {ImageTransparency = .2}):Play() end
                                 end
                                 
                                 for i, v in next, Dropdown.Value do
@@ -463,7 +471,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                                 Tween(TabPisun.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = 1}):Play()
                                 Tween(TabPisun.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = .4}):Play()
                                 if TabPisun.UIElements.TabIcon then
-                                    Tween(TabPisun.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = .2}):Play()
+                                    local img = TabPisun.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                                    if img then Tween(img, 0.1, {ImageTransparency = .2}):Play() end
                                 end
                                 TabPisun.Selected = false
                             end
@@ -472,7 +481,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                             Tween(TabMain.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = .75}):Play()
                             Tween(TabMain.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = 0}):Play()
                             if TabMain.UIElements.TabIcon then
-                                Tween(TabMain.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = 0}):Play()
+                                local img = TabMain.UIElements.TabIcon:FindFirstChild("ImageLabel")
+                                if img then Tween(img, 0.1, {ImageTransparency = 0}):Play() end
                             end
                             Dropdown.Value = TabMain.Original
                         end

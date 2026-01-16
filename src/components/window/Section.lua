@@ -135,7 +135,8 @@ function Section.New(SectionConfig, Parent, Folder, UIScale, Window)
                 Size = UDim2.new(1,0,0, SectionModule.HeaderSize + (SectionFrame.Content.AbsoluteSize.Y/UIScale))
             }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
             
-            Tween(ChevronIconFrame.ImageLabel, 0.1, {Rotation = 180}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+            local chevImg = ChevronIconFrame:FindFirstChild("ImageLabel")
+            if chevImg then Tween(chevImg, 0.1, {Rotation = 180}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play() end
         end
     end
     function SectionModule:Close()
@@ -144,7 +145,8 @@ function Section.New(SectionConfig, Parent, Folder, UIScale, Window)
             Tween(SectionFrame, 0.26, {
                 Size = UDim2.new(1,0,0, SectionModule.HeaderSize)
             }, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
-            Tween(ChevronIconFrame.ImageLabel, 0.1, {Rotation = 0}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play()
+            local chevImg = ChevronIconFrame:FindFirstChild("ImageLabel")
+            if chevImg then Tween(chevImg, 0.1, {Rotation = 0}, Enum.EasingStyle.Quint, Enum.EasingDirection.Out):Play() end
         end
     end
     
