@@ -13,22 +13,19 @@ function Acrylic.init()
 	-- DepthOfFieldEffect with adjusted parameters
 	local baseEffect = Instance.new("DepthOfFieldEffect")
 	baseEffect.FarIntensity = 0
-	baseEffect.InFocusRadius = 10
-	baseEffect.NearIntensity = 0.3
+	baseEffect.InFocusRadius = 0.1
+	baseEffect.NearIntensity = 1
 
 	local depthOfFieldDefaults = {}
 
 	function Acrylic.Enable()
-		for _, effect in pairs(depthOfFieldDefaults) do
-			effect.Enabled = false
-		end
+		-- Don't disable existing game effects - may break nametags
+		-- Just add our own effect
 		baseEffect.Parent = cloneref(game:GetService("Lighting"))
 	end
 
 	function Acrylic.Disable()
-		for _, effect in pairs(depthOfFieldDefaults) do
-			effect.Enabled = effect.enabled
-		end
+		-- Just remove our effect, don't touch game effects
 		baseEffect.Parent = nil
 	end
 
