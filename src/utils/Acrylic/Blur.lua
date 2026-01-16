@@ -21,7 +21,7 @@ local function createAcrylic()
 		CanCollide = false,
 		Locked = true,
 		CastShadow = false,
-		Transparency = 0.9, -- More visible blur (was 0.98)
+		Transparency = 0.98, -- More visible blur (was 0.98)
 	}, {
 		New("SpecialMesh", {
 			MeshType = Enum.MeshType.Brick,
