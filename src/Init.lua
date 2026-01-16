@@ -187,7 +187,7 @@ end
 function WindUI:ToggleAcrylic(Value)
 	if WindUI.Window and WindUI.Window.AcrylicPaint and WindUI.Window.AcrylicPaint.Model then
 		WindUI.Window.Acrylic = Value
-		WindUI.Window.AcrylicPaint.Model.Transparency = Value and 0.90 or 1
+		WindUI.Window.AcrylicPaint.Model.Transparency = Value and 0.98 or 1
 		
 		-- Adjust UI background transparency to show blur through
 		local mainUI = WindUI.Window.UIElements
@@ -196,7 +196,7 @@ function WindUI:ToggleAcrylic(Value)
 			local bg = mainUI.Main:FindFirstChild("Background")
 			if bg then
 				Creator.Tween(bg, 0.2, {
-					ImageTransparency = Value and 0.15 or 0  -- Keep solid
+					ImageTransparency = Value and 0.98 or 0  -- Keep solid
 				}):Play()
 			end
 			
@@ -205,7 +205,7 @@ function WindUI:ToggleAcrylic(Value)
 				local panelBg = mainUI.MainBar:FindFirstChild("Background")
 				if panelBg then
 					Creator.Tween(panelBg, 0.2, {
-						ImageTransparency = Value and 0.9 or 1  -- Darker to match sidebar
+						ImageTransparency = Value and 0.98 or 1  -- Darker to match sidebar
 					}):Play()
 				end
 			end
