@@ -1034,7 +1034,8 @@ if not d:IsStudio()then writefile(J,L)end
 
 local M,N=pcall(getcustomasset,J)
 if M then
-H.ImageLabel.Image=N
+local O=H:FindFirstChild"ImageLabel"
+if O then O.Image=N end
 else
 warn(string.format("[ WindUI.Creator ] Failed to load custom asset '%s': %s",J,tostring(N)))
 H:Destroy()
@@ -1051,7 +1052,8 @@ end
 elseif v==""then
 H.Visible=false
 else
-H.ImageLabel.Image=v
+local J=H:FindFirstChild"ImageLabel"
+if J then J.Image=v end
 end
 
 return H
@@ -4050,7 +4052,10 @@ false
 )
 
 ai.Size=UDim2.new(0,ah.IconSize,0,ah.IconSize)
-ai.ImageLabel.ImageColor3=typeof(ah.Color)=="Color3"and ab.GetTextColorForHSB(ah.Color)or nil
+local aj=ai:FindFirstChild"ImageLabel"
+if aj and typeof(ah.Color)=="Color3"then
+aj.ImageColor3=ab.GetTextColorForHSB(ah.Color)
+end
 end
 
 local aj=ac("TextLabel",{
@@ -4073,7 +4078,8 @@ end
 
 aj.TextColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))
 if ai then
-ai.ImageLabel.ImageColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))
+local al=ai:FindFirstChild"ImageLabel"
+if al then al.ImageColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))end
 end
 end
 
@@ -4135,7 +4141,8 @@ ak:Destroy()
 end
 ad(aj,.06,{TextColor3=ab.GetTextColorForHSB(an)}):Play()
 if ai then
-ad(ai.ImageLabel,.06,{ImageColor3=ab.GetTextColorForHSB(an)}):Play()
+local ao=ai:FindFirstChild"ImageLabel"
+if ao then ad(ao,.06,{ImageColor3=ab.GetTextColorForHSB(an)}):Play()end
 end
 ad(al,.06,{ImageColor3=an}):Play()
 end
@@ -4160,9 +4167,11 @@ ai.Size=UDim2.new(0,ah.IconSize,0,ah.IconSize)
 ai.Parent=al
 
 if typeof(ah.Color)=="Color3"then
-ai.ImageLabel.ImageColor3=ab.GetTextColorForHSB(ah.Color)
+local ao=ai:FindFirstChild"ImageLabel"
+if ao then ao.ImageColor3=ab.GetTextColorForHSB(ah.Color)end
 elseif typeof(ah.Color)=="table"then
-ai.ImageLabel.ImageColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))
+local ao=ai:FindFirstChild"ImageLabel"
+if ao then ao.ImageColor3=ab.GetTextColorForHSB(ab.GetAverageColor(ak))end
 end
 else
 if ai then
@@ -9220,29 +9229,31 @@ end
 function am.Open(au,av)
 if am.Expandable then
 am.Opened=true
+local aw=ao:FindFirstChild"ImageLabel"
 if av then
 as.Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y)/ak.UIScale+(as.Content.AbsoluteSize.Y/ak.UIScale))
-ao.ImageLabel.Rotation=180
+if aw then aw.Rotation=180 end
 else
 af(as,0.33,{
 Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y)/ak.UIScale+(as.Content.AbsoluteSize.Y/ak.UIScale))
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-af(ao.ImageLabel,0.2,{Rotation=180},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if aw then af(aw,0.2,{Rotation=180},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()end
 end
 end
 end
 function am.Close(au,av)
 if am.Expandable then
 am.Opened=false
+local aw=ao:FindFirstChild"ImageLabel"
 if av then
 as.Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y/ak.UIScale))
-ao.ImageLabel.Rotation=0
+if aw then aw.Rotation=0 end
 else
 af(as,0.26,{
 Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y/ak.UIScale))
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-af(ao.ImageLabel,0.2,{Rotation=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if aw then af(aw,0.2,{Rotation=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()end
 end
 end
 end
@@ -11360,7 +11371,8 @@ end
 function au.User.SetAnonymous(b,d)
 if d~=false then d=true end
 au.User.Anonymous=d
-aB.UserIcon.ImageLabel.Image=GetUserThumb()
+local f=aB.UserIcon:FindFirstChild"ImageLabel"
+if f then f.Image=GetUserThumb()end
 aB.UserIcon.Frame.DisplayName.Text=d and"Anonymous"or ah.LocalPlayer.DisplayName
 aB.UserIcon.Frame.UserName.Text=d and"anonymous"or ah.LocalPlayer.Name
 end
@@ -11952,7 +11964,8 @@ end
 
 
 function au.SetBackgroundImage(v,x)
-au.UIElements.Main.Background.ImageLabel.Image=x
+local z=au.UIElements.Main.Background:FindFirstChild"ImageLabel"
+if z then z.Image=x end
 end
 function au.SetBackgroundImageTransparency(v,x)
 if g and g:IsA"ImageLabel"then
@@ -13026,7 +13039,7 @@ if az and az.Main then
 local aA=az.Main:FindFirstChild"Background"
 if aA then
 ap.Tween(aA,0.2,{
-ImageTransparency=ay and 0.15 or 0
+ImageTransparency=ay and 0.2 or 0
 }):Play()
 end
 
@@ -13035,7 +13048,7 @@ if az.MainBar then
 local aB=az.MainBar:FindFirstChild"Background"
 if aB then
 ap.Tween(aB,0.2,{
-ImageTransparency=ay and 0.3 or 0
+ImageTransparency=ay and 0.85 or 0.95
 }):Play()
 end
 end
