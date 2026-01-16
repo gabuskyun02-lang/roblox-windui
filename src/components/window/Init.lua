@@ -41,8 +41,8 @@ return function(Config)
         
         Size = Config.Size,
         
-        MinSize = Config.MinSize or Vector2.new(560, 350),
-        MaxSize = Config.MaxSize or Vector2.new(850, 560),
+        MinSize = Config.MinSize or Vector2.new(480, 320),
+        MaxSize = Config.MaxSize or Vector2.new(750, 520),
     
         TopBarButtonIconSize = Config.TopBarButtonIconSize ,
         
@@ -52,7 +52,7 @@ return function(Config)
         Transparent = Config.Transparent or false,
         HideSearchBar = Config.HideSearchBar ~= false,
         ScrollBarEnabled = Config.ScrollBarEnabled or false,
-        SideBarWidth = Config.SideBarWidth or 200,
+        SideBarWidth = Config.SideBarWidth or 180,
         Acrylic = Config.Acrylic or false,
         NewElements = Config.NewElements or false,
         IgnoreAlerts = Config.IgnoreAlerts or false,
@@ -84,7 +84,7 @@ return function(Config)
         
         IsPC = false,
         
-        Gap = 5,
+        Gap = 8,
         
         TopBarButtons = {},
         AllElements = {},
@@ -105,7 +105,7 @@ return function(Config)
         UICorner = Window.ElementsRadius or (Window.NewElements and 23 or 12),
     }
     
-    local WindowSize = Window.Size or UDim2.new(0, 580, 0, 460)
+    local WindowSize = Window.Size or UDim2.new(0, 540, 0, 400)
     Window.Size = UDim2.new(
         WindowSize.X.Scale,
         math.clamp(WindowSize.X.Offset, Window.MinSize.X, Window.MaxSize.X),

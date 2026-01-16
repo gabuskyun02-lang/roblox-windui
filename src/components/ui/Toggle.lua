@@ -32,7 +32,7 @@ function Toggle.New(Value, Icon, IconSize, Parent, Callback, NewElement, Config)
     })
     
     local ToggleFrame = Creator.NewRoundFrame(Radius, "Squircle",{
-        ImageTransparency = .85,
+        ImageTransparency = .92, -- More subtle background
         ThemeTag = {
             ImageColor3 = "Text"
         },
@@ -86,8 +86,8 @@ function Toggle.New(Value, Icon, IconSize, Parent, Callback, NewElement, Config)
                     Size = UDim2.new(1,0,1,0),
                     ImageColor3 = Color3.new(1,1,1),
                     Name = "Highlight",
-                    ImageTransparency = 0.4,
-                }, {
+                    ImageTransparency = 0.25, -- Softer glass highlight
+                }), {
                     -- New("UIGradient", {
                     --     Rotation = 60,
                     --     Color = ColorSequence.new({

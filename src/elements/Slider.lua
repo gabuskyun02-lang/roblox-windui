@@ -115,7 +115,7 @@ function Element:New(Config)
     
     
     Slider.UIElements.SliderIcon = Creator.NewRoundFrame(99, "Squircle", {
-        ImageTransparency = .95,
+        ImageTransparency = .92, -- More subtle track
         Size = UDim2.new(1, not Slider.IsTextbox and -TotalSliderWidth or (-Slider.TextBoxWidth-8), 0, 4),
         AnchorPoint = Vector2.new(0.5,0.5),
         Position = UDim2.new(0.5,0,0.5,0),
@@ -145,7 +145,7 @@ function Element:New(Config)
                     Size = UDim2.new(1,0,1,0),
                     ImageColor3 = Color3.new(1,1,1),
                     Name = "Highlight",
-                    ImageTransparency = .6,
+                    ImageTransparency = .35, -- Softer glass effect
                 }, {
                     -- New("UIGradient", {
                     --     Rotation = 60,

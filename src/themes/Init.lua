@@ -3,17 +3,22 @@ return function(WindUI)
         Dark = {
             Name = "Dark",
             
-            Accent = Color3.fromHex("#18181b"),
-            Dialog = Color3.fromHex("#161616"),
-            Outline = Color3.fromHex("#FFFFFF"),
-            Text = Color3.fromHex("#FFFFFF"),
-            Placeholder = Color3.fromHex("#7a7a7a"),
-            Background = Color3.fromHex("#101010"),
-            Button = Color3.fromHex("#52525b"),
-            Icon = Color3.fromHex("#a1a1aa"),
-            Toggle = Color3.fromHex("#33C759"),
-            Slider = Color3.fromHex("#0091FF"),
-            Checkbox = Color3.fromHex("#0091FF"),
+            -- Glassmorphism base colors
+            Accent = Color3.fromHex("#1a2332"),
+            Dialog = Color3.fromHex("#151c28"),
+            Outline = Color3.fromHex("#3d5a80"),
+            Text = Color3.fromHex("#e8edf5"),
+            Placeholder = Color3.fromHex("#6b7d94"),
+            Background = Color3.fromHex("#0f1419"),
+            Button = Color3.fromHex("#2a3f5f"),
+            Icon = Color3.fromHex("#8b9cb3"),
+            Toggle = Color3.fromHex("#4a9eff"),
+            Slider = Color3.fromHex("#4a9eff"),
+            Checkbox = Color3.fromHex("#4a9eff"),
+            
+            -- Card/Section specific
+            CardBackground = Color3.fromHex("#1a2332"),
+            CardBorder = Color3.fromHex("#2a3f5f"),
         },
 
         Light = {

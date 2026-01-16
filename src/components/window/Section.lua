@@ -12,10 +12,11 @@ function Section.New(SectionConfig, Parent, Folder, UIScale, Window)
         Title = SectionConfig.Title or "Section",
         Icon = SectionConfig.Icon,
         IconThemed = SectionConfig.IconThemed,
-        Opened = SectionConfig.Opened or false,
+        Opened = SectionConfig.Opened ~= false, -- Open by default
         
-        HeaderSize = 42,
-        IconSize = 18,
+        HeaderSize = 32, -- Compact header
+        IconSize = 14,
+        TextSize = 11, -- Small uppercase text
         
         Expandable = false,
     }
@@ -67,7 +68,8 @@ function Section.New(SectionConfig, Parent, Folder, UIScale, Window)
         }, {
             IconFrame,
             New("TextLabel", {
-                Text = SectionModule.Title,
+                -- Uppercase section label
+                Text = string.upper(SectionModule.Title),
                 TextXAlignment = "Left",
                 Size = UDim2.new(
                     1, 
@@ -81,10 +83,9 @@ function Section.New(SectionConfig, Parent, Folder, UIScale, Window)
                     TextColor3 = "Text",
                 },
                 FontFace = Font.new(Creator.Font, Enum.FontWeight.SemiBold),
-                TextSize = 14,
+                TextSize = SectionModule.TextSize,
                 BackgroundTransparency = 1,
-                TextTransparency = .7,
-                --TextTruncate = "AtEnd",
+                TextTransparency = .55, -- Muted appearance
                 TextWrapped = true
             }),
             New("UIListLayout", {

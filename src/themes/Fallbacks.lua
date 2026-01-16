@@ -64,13 +64,19 @@ return {
     TooltipSecondaryText = "White",
     
     SectionExpandIcon = "White",
-    SectionExpandIconTransparency = .4,
-    SectionBox = "White",
-    SectionBoxTransparency = .95,
-    SectionBoxBorder = "White",
-    SectionBoxBorderTransparency = .75,
-    SectionBoxBackground = "White",
-    SectionBoxBackgroundTransparency = .95,
+    SectionExpandIconTransparency = .35,
+    SectionBox = "CardBackground",
+    SectionBoxTransparency = .88,
+    SectionBoxBorder = "CardBorder",
+    SectionBoxBorderTransparency = .55,
+    SectionBoxBackground = "CardBackground",
+    SectionBoxBackgroundTransparency = .88,
+    
+    -- Card container tokens
+    CardBackground = "Accent",
+    CardBackgroundTransparency = .88,
+    CardBorder = "Outline",
+    CardBorderTransparency = .55,
     
     SearchBarBorder = "White",
     SearchBarBorderTransparency = .75,

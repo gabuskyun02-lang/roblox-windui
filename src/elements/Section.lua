@@ -5,30 +5,36 @@ local Tween = Creator.Tween
 local Element = {}
 
 function Element:New(Config)
+    -- Determine if this is a card-style section (Box=true by default for modern look)
+    local isCardStyle = Config.Box ~= false
+    
     local Section = {
         __type = "Section",
         Title = Config.Title or "Section",
         Desc = Config.Desc,
         Icon = Config.Icon,
         TextXAlignment = Config.TextXAlignment or "Left",
-        TextSize = Config.TextSize or 19,
-        DescTextSize = Config.DescTextSize or 16,
-        Box = Config.Box or false,
-        BoxBorder = Config.BoxBorder or false,
+        -- Card-style headers use smaller, uppercase text
+        TextSize = Config.TextSize or (isCardStyle and 11 or 19),
+        DescTextSize = Config.DescTextSize or 14,
+        Box = isCardStyle,
+        BoxBorder = Config.BoxBorder ~= false, -- Border visible by default
         FontWeight = Config.FontWeight or Enum.FontWeight.SemiBold,
         DescFontWeight = Config.DescFontWeight or Enum.FontWeight.Medium,
-        TextTransparency = Config.TextTransparency or 0.05,
+        -- Card headers are muted
+        TextTransparency = Config.TextTransparency or (isCardStyle and 0.45 or 0.05),
         DescTextTransparency = Config.DescTextTransparency or 0.4,
-        Opened = Config.Opened or false,
+        Opened = Config.Opened ~= false, -- Open by default
         UIElements = {},
 
-        HeaderSize = 42,
-        IconSize = 20,
-        Padding = 10,
+        HeaderSize = isCardStyle and 28 or 42,
+        IconSize = isCardStyle and 14 or 20,
+        Padding = isCardStyle and 8 or 10,
 
         Elements = {},
 
         Expandable = false,
+        IsCardStyle = isCardStyle,
     }
 
     local Icon
@@ -88,6 +94,9 @@ function Element:New(Config)
     local TitleFrame, DescFrame
 
     local function createTitle(Text, Type) 
+        -- Card-style sections use uppercase for header labels
+        local displayText = (Type == "Title" and Section.IsCardStyle) and string.upper(Text) or Text
+        
         return New("TextLabel", {
             BackgroundTransparency = 1,
             TextXAlignment = Section.TextXAlignment,
@@ -100,7 +109,7 @@ function Element:New(Config)
             FontFace = Font.new(Creator.Font, Type == "Title" and Section.FontWeight or Section.DescFontWeight),
             --Parent = Config.Parent,
             --Size = UDim2.new(1,0,0,0),
-            Text = Text,
+            Text = displayText,
             Size = UDim2.new(
                 1, 
                 0,
