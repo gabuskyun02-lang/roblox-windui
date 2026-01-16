@@ -302,13 +302,19 @@ TooltipSecondary="Primary",
 TooltipSecondaryText="White",
 
 SectionExpandIcon="White",
-SectionExpandIconTransparency=.4,
-SectionBox="White",
-SectionBoxTransparency=.95,
-SectionBoxBorder="White",
-SectionBoxBorderTransparency=.75,
-SectionBoxBackground="White",
-SectionBoxBackgroundTransparency=.95,
+SectionExpandIconTransparency=.35,
+SectionBox="CardBackground",
+SectionBoxTransparency=.88,
+SectionBoxBorder="CardBorder",
+SectionBoxBorderTransparency=.55,
+SectionBoxBackground="CardBackground",
+SectionBoxBackgroundTransparency=.88,
+
+
+CardBackground="Accent",
+CardBackgroundTransparency=.88,
+CardBorder="Outline",
+CardBorderTransparency=.55,
 
 SearchBarBorder="White",
 SearchBarBorderTransparency=.75,
@@ -3486,17 +3492,22 @@ return{
 Dark={
 Name="Dark",
 
-Accent=Color3.fromHex"#18181b",
-Dialog=Color3.fromHex"#161616",
-Outline=Color3.fromHex"#FFFFFF",
-Text=Color3.fromHex"#FFFFFF",
-Placeholder=Color3.fromHex"#7a7a7a",
-Background=Color3.fromHex"#101010",
-Button=Color3.fromHex"#52525b",
-Icon=Color3.fromHex"#a1a1aa",
-Toggle=Color3.fromHex"#33C759",
-Slider=Color3.fromHex"#0091FF",
-Checkbox=Color3.fromHex"#0091FF",
+
+Accent=Color3.fromHex"#1a2332",
+Dialog=Color3.fromHex"#151c28",
+Outline=Color3.fromHex"#3d5a80",
+Text=Color3.fromHex"#e8edf5",
+Placeholder=Color3.fromHex"#6b7d94",
+Background=Color3.fromHex"#0f1419",
+Button=Color3.fromHex"#2a3f5f",
+Icon=Color3.fromHex"#8b9cb3",
+Toggle=Color3.fromHex"#4a9eff",
+Slider=Color3.fromHex"#4a9eff",
+Checkbox=Color3.fromHex"#4a9eff",
+
+
+CardBackground=Color3.fromHex"#1a2332",
+CardBorder=Color3.fromHex"#2a3f5f",
 },
 
 Light={
@@ -5900,7 +5911,7 @@ Parent=ai,
 })
 
 local aq=ab.NewRoundFrame(an,"Squircle",{
-ImageTransparency=.85,
+ImageTransparency=.92,
 ThemeTag={
 ImageColor3="Text"
 },
@@ -5954,21 +5965,7 @@ ab.NewRoundFrame(an,"Glass-1",{
 Size=UDim2.new(1,0,1,0),
 ImageColor3=Color3.new(1,1,1),
 Name="Highlight",
-ImageTransparency=0.4,
-},{
-
-
-
-
-
-
-
-
-
-
-
-
-
+ImageTransparency=0.25,
 }),
 ao,
 ac("UIScale",{
@@ -6471,7 +6468,7 @@ ParentConfig=ak,
 
 
 al.UIElements.SliderIcon=ae.NewRoundFrame(99,"Squircle",{
-ImageTransparency=.95,
+ImageTransparency=.92,
 Size=UDim2.new(1,not al.IsTextbox and-aw or(-al.TextBoxWidth-8),0,4),
 AnchorPoint=Vector2.new(0.5,0.5),
 Position=UDim2.new(0.5,0,0.5,0),
@@ -6501,7 +6498,7 @@ ae.NewRoundFrame(99,"Glass-1",{
 Size=UDim2.new(1,0,1,0),
 ImageColor3=Color3.new(1,1,1),
 Name="Highlight",
-ImageTransparency=.6,
+ImageTransparency=.35,
 },{
 
 
@@ -8942,53 +8939,59 @@ local af=aa.Tween
 local ah={}
 
 function ah.New(aj,ak)
-local al={
+
+local al=ak.Box~=false
+
+local am={
 __type="Section",
 Title=ak.Title or"Section",
 Desc=ak.Desc,
 Icon=ak.Icon,
 TextXAlignment=ak.TextXAlignment or"Left",
-TextSize=ak.TextSize or 19,
-DescTextSize=ak.DescTextSize or 16,
-Box=ak.Box or false,
-BoxBorder=ak.BoxBorder or false,
+
+TextSize=ak.TextSize or(al and 11 or 19),
+DescTextSize=ak.DescTextSize or 14,
+Box=al,
+BoxBorder=ak.BoxBorder~=false,
 FontWeight=ak.FontWeight or Enum.FontWeight.SemiBold,
 DescFontWeight=ak.DescFontWeight or Enum.FontWeight.Medium,
-TextTransparency=ak.TextTransparency or 0.05,
+
+TextTransparency=ak.TextTransparency or(al and 0.45 or 0.05),
 DescTextTransparency=ak.DescTextTransparency or 0.4,
-Opened=ak.Opened or false,
+Opened=ak.Opened~=false,
 UIElements={},
 
-HeaderSize=42,
-IconSize=20,
-Padding=10,
+HeaderSize=al and 28 or 42,
+IconSize=al and 14 or 20,
+Padding=al and 8 or 10,
 
 Elements={},
 
 Expandable=false,
+IsCardStyle=al,
 }
 
-local am
+local an
 
 
-function al.SetIcon(an,ao)
-al.Icon=ao or nil
-if am then am:Destroy()end
-if ao then
-am=aa.Image(
-ao,
-ao..":"..al.Title,
+function am.SetIcon(ao,ap)
+am.Icon=ap or nil
+if an then an:Destroy()end
+if ap then
+an=aa.Image(
+ap,
+ap..":"..am.Title,
 0,
 ak.Window.Folder,
-al.__type,
+am.__type,
 true
 )
-am.Size=UDim2.new(0,al.IconSize,0,al.IconSize)
+an.Size=UDim2.new(0,am.IconSize,0,am.IconSize)
 end
 end
 
-local an=ae("Frame",{
-Size=UDim2.new(0,al.IconSize,0,al.IconSize),
+local ao=ae("Frame",{
+Size=UDim2.new(0,am.IconSize,0,am.IconSize),
 BackgroundTransparency=1,
 Visible=false
 },{
@@ -9006,38 +9009,41 @@ ImageColor3="SectionExpandIcon",
 })
 
 
-if al.Icon then
-al:SetIcon(al.Icon)
+if am.Icon then
+am:SetIcon(am.Icon)
 end
 
-local ao=ae("Frame",{
+local ap=ae("Frame",{
 Size=UDim2.new(1,0,1,0),
 BackgroundTransparency=1,
 },{
 ae("UIListLayout",{
 FillDirection="Vertical",
-HorizontalAlignment=al.TextXAlignment,
+HorizontalAlignment=am.TextXAlignment,
 VerticalAlignment="Center",
 Padding=UDim.new(0,4)
 })
 })
 
-local ap,aq
+local aq,ar
 
-local function createTitle(ar,as)
+local function createTitle(as,at)
+
+local au=(at=="Title"and am.IsCardStyle)and string.upper(as)or as
+
 return ae("TextLabel",{
 BackgroundTransparency=1,
-TextXAlignment=al.TextXAlignment,
+TextXAlignment=am.TextXAlignment,
 AutomaticSize="Y",
-TextSize=as=="Title"and al.TextSize or al.DescTextSize,
-TextTransparency=as=="Title"and al.TextTransparency or al.DescTextTransparency,
+TextSize=at=="Title"and am.TextSize or am.DescTextSize,
+TextTransparency=at=="Title"and am.TextTransparency or am.DescTextTransparency,
 ThemeTag={
 TextColor3="Text",
 },
-FontFace=Font.new(aa.Font,as=="Title"and al.FontWeight or al.DescFontWeight),
+FontFace=Font.new(aa.Font,at=="Title"and am.FontWeight or am.DescFontWeight),
 
 
-Text=ar,
+Text=au,
 Size=UDim2.new(
 1,
 0,
@@ -9045,38 +9051,38 @@ Size=UDim2.new(
 0
 ),
 TextWrapped=true,
-Parent=ao,
+Parent=ap,
 })
 end
 
-ap=createTitle(al.Title,"Title")
-if al.Desc then
-aq=createTitle(al.Desc,"Desc")
+aq=createTitle(am.Title,"Title")
+if am.Desc then
+ar=createTitle(am.Desc,"Desc")
 end
 
 local function UpdateTitleSize()
-local ar=0
-if am then
-ar=ar-(al.IconSize+8)
+local as=0
+if an then
+as=as-(am.IconSize+8)
 end
-if an.Visible then
-ar=ar-(al.IconSize+8)
+if ao.Visible then
+as=as-(am.IconSize+8)
 end
-ao.Size=UDim2.new(1,ar,0,0)
+ap.Size=UDim2.new(1,as,0,0)
 end
 
 
-local ar=aa.NewRoundFrame(ak.Window.ElementConfig.UICorner,"Squircle",{
+local as=aa.NewRoundFrame(ak.Window.ElementConfig.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
 BackgroundTransparency=1,
 Parent=ak.Parent,
 ClipsDescendants=true,
 AutomaticSize="Y",
 ThemeTag={
-ImageTransparency=al.Box and"SectionBoxBackgroundTransparency"or nil,
+ImageTransparency=am.Box and"SectionBoxBackgroundTransparency"or nil,
 ImageColor3="SectionBoxBackground",
 },
-ImageTransparency=not al.Box and 1 or nil,
+ImageTransparency=not am.Box and 1 or nil,
 },{
 aa.NewRoundFrame(ak.Window.ElementConfig.UICorner,ak.Window.NewElements and"Glass-1"or"SquircleOutline",{
 Size=UDim2.new(1,0,1,0),
@@ -9085,31 +9091,31 @@ ThemeTag={
 ImageTransparency="SectionBoxBorderTransparency",
 ImageColor3="SectionBoxBorder",
 },
-Visible=al.Box and al.BoxBorder,
+Visible=am.Box and am.BoxBorder,
 Name="Outline",
 }),
 ae("TextButton",{
-Size=UDim2.new(1,0,0,al.Expandable and 0 or(not aq and al.HeaderSize or 0)),
+Size=UDim2.new(1,0,0,am.Expandable and 0 or(not ar and am.HeaderSize or 0)),
 BackgroundTransparency=1,
-AutomaticSize=(not al.Expandable or aq)and"Y"or nil,
+AutomaticSize=(not am.Expandable or ar)and"Y"or nil,
 Text="",
 Name="Top",
 },{
-al.Box and ae("UIPadding",{
+am.Box and ae("UIPadding",{
 PaddingTop=UDim.new(0,ak.Window.ElementConfig.UIPadding+(ak.Window.NewElements and 4 or 0)),
 PaddingLeft=UDim.new(0,ak.Window.ElementConfig.UIPadding+(ak.Window.NewElements and 4 or 0)),
 PaddingRight=UDim.new(0,ak.Window.ElementConfig.UIPadding+(ak.Window.NewElements and 4 or 0)),
 PaddingBottom=UDim.new(0,ak.Window.ElementConfig.UIPadding+(ak.Window.NewElements and 4 or 0)),
 })or nil,
-am,
-ao,
+an,
+ap,
 ae("UIListLayout",{
 Padding=UDim.new(0,8),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
 HorizontalAlignment="Left",
 }),
-an,
+ao,
 }),
 ae("Frame",{
 BackgroundTransparency=1,
@@ -9117,9 +9123,9 @@ Size=UDim2.new(1,0,0,0),
 AutomaticSize="Y",
 Name="Content",
 Visible=false,
-Position=UDim2.new(0,0,0,al.HeaderSize)
+Position=UDim2.new(0,0,0,am.HeaderSize)
 },{
-al.Box and ae("UIPadding",{
+am.Box and ae("UIPadding",{
 PaddingLeft=UDim.new(0,ak.Window.ElementConfig.UIPadding),
 PaddingRight=UDim.new(0,ak.Window.ElementConfig.UIPadding),
 PaddingBottom=UDim.new(0,ak.Window.ElementConfig.UIPadding),
@@ -9136,107 +9142,107 @@ VerticalAlignment="Top",
 
 
 
-al.ElementFrame=ar
+am.ElementFrame=as
 
-if aq then
-ar.Top:GetPropertyChangedSignal"AbsoluteSize":Connect(function()
-ar.Content.Position=UDim2.new(0,0,0,ar.Top.AbsoluteSize.Y/ak.UIScale)
+if ar then
+as.Top:GetPropertyChangedSignal"AbsoluteSize":Connect(function()
+as.Content.Position=UDim2.new(0,0,0,as.Top.AbsoluteSize.Y/ak.UIScale)
 
-if al.Opened then al:Open(true)else al.Close(true)end
+if am.Opened then am:Open(true)else am.Close(true)end
 end)
 end
 
 
-local as=ak.ElementsModule
+local at=ak.ElementsModule
 
-as.Load(al,ar.Content,as.Elements,ak.Window,ak.WindUI,function()
-if not al.Expandable then
-al.Expandable=true
-an.Visible=true
+at.Load(am,as.Content,at.Elements,ak.Window,ak.WindUI,function()
+if not am.Expandable then
+am.Expandable=true
+ao.Visible=true
 UpdateTitleSize()
 end
-end,as,ak.UIScale,ak.Tab)
+end,at,ak.UIScale,ak.Tab)
 
 
 UpdateTitleSize()
 
-function al.SetTitle(at,au)
-al.Title=au
-ap.Text=au
+function am.SetTitle(au,av)
+am.Title=av
+aq.Text=av
 end
 
-function al.SetDesc(at,au)
-al.Desc=au
-if not aq then
-aq=createTitle(au,"Desc")
+function am.SetDesc(au,av)
+am.Desc=av
+if not ar then
+ar=createTitle(av,"Desc")
 end
-aq.Text=au
-end
-
-function al.Destroy(at)
-for au,av in next,al.Elements do
-av:Destroy()
+ar.Text=av
 end
 
-
-
-
-
-
-
-
-ar:Destroy()
+function am.Destroy(au)
+for av,aw in next,am.Elements do
+aw:Destroy()
 end
 
-function al.Open(at,au)
-if al.Expandable then
-al.Opened=true
-if au then
-ar.Size=UDim2.new(ar.Size.X.Scale,ar.Size.X.Offset,0,(ar.Top.AbsoluteSize.Y)/ak.UIScale+(ar.Content.AbsoluteSize.Y/ak.UIScale))
-an.ImageLabel.Rotation=180
+
+
+
+
+
+
+
+as:Destroy()
+end
+
+function am.Open(au,av)
+if am.Expandable then
+am.Opened=true
+if av then
+as.Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y)/ak.UIScale+(as.Content.AbsoluteSize.Y/ak.UIScale))
+ao.ImageLabel.Rotation=180
 else
-af(ar,0.33,{
-Size=UDim2.new(ar.Size.X.Scale,ar.Size.X.Offset,0,(ar.Top.AbsoluteSize.Y)/ak.UIScale+(ar.Content.AbsoluteSize.Y/ak.UIScale))
+af(as,0.33,{
+Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y)/ak.UIScale+(as.Content.AbsoluteSize.Y/ak.UIScale))
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-af(an.ImageLabel,0.2,{Rotation=180},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+af(ao.ImageLabel,0.2,{Rotation=180},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end
 end
-function al.Close(at,au)
-if al.Expandable then
-al.Opened=false
-if au then
-ar.Size=UDim2.new(ar.Size.X.Scale,ar.Size.X.Offset,0,(ar.Top.AbsoluteSize.Y/ak.UIScale))
-an.ImageLabel.Rotation=0
+function am.Close(au,av)
+if am.Expandable then
+am.Opened=false
+if av then
+as.Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y/ak.UIScale))
+ao.ImageLabel.Rotation=0
 else
-af(ar,0.26,{
-Size=UDim2.new(ar.Size.X.Scale,ar.Size.X.Offset,0,(ar.Top.AbsoluteSize.Y/ak.UIScale))
+af(as,0.26,{
+Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,(as.Top.AbsoluteSize.Y/ak.UIScale))
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-af(an.ImageLabel,0.2,{Rotation=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+af(ao.ImageLabel,0.2,{Rotation=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end
 end
 
-aa.AddSignal(ar.Top.MouseButton1Click,function()
-if al.Expandable then
-if al.Opened then
-al:Close()
+aa.AddSignal(as.Top.MouseButton1Click,function()
+if am.Expandable then
+if am.Opened then
+am:Close()
 else
-al:Open()
+am:Open()
 end
 end
 end)
 
-aa.AddSignal(ar.Content.UIListLayout:GetPropertyChangedSignal"AbsoluteContentSize",function()
-if al.Opened then
-al:Open(true)
+aa.AddSignal(as.Content.UIListLayout:GetPropertyChangedSignal"AbsoluteContentSize",function()
+if am.Opened then
+am:Open(true)
 end
 end)
 
 task.spawn(function()
 task.wait(0.02)
-if al.Expandable then
+if am.Expandable then
 
 
 
@@ -9245,19 +9251,19 @@ if al.Expandable then
 
 
 
-ar.Size=UDim2.new(ar.Size.X.Scale,ar.Size.X.Offset,0,ar.Top.AbsoluteSize.Y/ak.UIScale)
-ar.AutomaticSize="None"
-ar.Top.Size=UDim2.new(1,0,0,(not aq and al.HeaderSize or 0))
-ar.Top.AutomaticSize=(not al.Expandable or aq)and"Y"or"None"
-ar.Content.Visible=true
+as.Size=UDim2.new(as.Size.X.Scale,as.Size.X.Offset,0,as.Top.AbsoluteSize.Y/ak.UIScale)
+as.AutomaticSize="None"
+as.Top.Size=UDim2.new(1,0,0,(not ar and am.HeaderSize or 0))
+as.Top.AutomaticSize=(not am.Expandable or ar)and"Y"or"None"
+as.Content.Visible=true
 end
-if al.Opened then
-al:Open()
+if am.Opened then
+am:Open()
 end
 
 end)
 
-return al.__type,al
+return am.__type,am
 end
 
 return ah end function a.S()
@@ -9617,7 +9623,7 @@ Elements={},
 ContainerFrame=nil,
 UICorner=Window.UICorner-(Window.UIPadding/2),
 
-Gap=Window.NewElements and 1 or 6,
+Gap=4,
 
 TabPaddingX=4+(Window.UIPadding/2),
 TabPaddingY=3+(Window.UIPadding/2),
@@ -10150,10 +10156,11 @@ local ap={
 Title=ak.Title or"Section",
 Icon=ak.Icon,
 IconThemed=ak.IconThemed,
-Opened=ak.Opened or false,
+Opened=ak.Opened~=false,
 
-HeaderSize=42,
-IconSize=18,
+HeaderSize=32,
+IconSize=14,
+TextSize=11,
 
 Expandable=false,
 }
@@ -10205,7 +10212,8 @@ Text="",
 },{
 aq,
 af("TextLabel",{
-Text=ap.Title,
+
+Text=string.upper(ap.Title),
 TextXAlignment="Left",
 Size=UDim2.new(
 1,
@@ -10219,10 +10227,9 @@ ThemeTag={
 TextColor3="Text",
 },
 FontFace=Font.new(ae.Font,Enum.FontWeight.SemiBold),
-TextSize=14,
+TextSize=ap.TextSize,
 BackgroundTransparency=1,
-TextTransparency=.7,
-
+TextTransparency=.55,
 TextWrapped=true
 }),
 af("UIListLayout",{
@@ -10892,8 +10899,8 @@ Topbar=at.Topbar or{Height=52,ButtonsType="Default"},
 
 Size=at.Size,
 
-MinSize=at.MinSize or Vector2.new(560,350),
-MaxSize=at.MaxSize or Vector2.new(850,560),
+MinSize=at.MinSize or Vector2.new(480,320),
+MaxSize=at.MaxSize or Vector2.new(750,520),
 
 TopBarButtonIconSize=at.TopBarButtonIconSize,
 
@@ -10903,7 +10910,7 @@ Radius=at.Radius or 16,
 Transparent=at.Transparent or false,
 HideSearchBar=at.HideSearchBar~=false,
 ScrollBarEnabled=at.ScrollBarEnabled or false,
-SideBarWidth=at.SideBarWidth or 200,
+SideBarWidth=at.SideBarWidth or 180,
 Acrylic=at.Acrylic or false,
 NewElements=at.NewElements or false,
 IgnoreAlerts=at.IgnoreAlerts or false,
@@ -10935,7 +10942,7 @@ OnDestroyCallback=nil,
 
 IsPC=false,
 
-Gap=5,
+Gap=8,
 
 TopBarButtons={},
 AllElements={},
@@ -10956,7 +10963,7 @@ UIPadding=(au.NewElements and 10 or 13),
 UICorner=au.ElementsRadius or(au.NewElements and 23 or 12),
 }
 
-local av=au.Size or UDim2.new(0,580,0,460)
+local av=au.Size or UDim2.new(0,540,0,400)
 au.Size=UDim2.new(
 av.X.Scale,
 math.clamp(av.X.Offset,au.MinSize.X,au.MaxSize.X),
