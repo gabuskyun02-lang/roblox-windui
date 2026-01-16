@@ -196,7 +196,7 @@ function WindUI:ToggleAcrylic(Value)
 			local bg = mainUI.Main:FindFirstChild("Background")
 			if bg then
 				Creator.Tween(bg, 0.2, {
-					ImageTransparency = Value and 0 or 0  -- Keep solid
+					ImageTransparency = Value and 0.15 or 0  -- Keep solid
 				}):Play()
 			end
 			
@@ -205,7 +205,7 @@ function WindUI:ToggleAcrylic(Value)
 				local panelBg = mainUI.MainBar:FindFirstChild("Background")
 				if panelBg then
 					Creator.Tween(panelBg, 0.2, {
-						ImageTransparency = Value and 0.95 or 0.95  -- Keep mostly opaque
+						ImageTransparency = Value and 0.3 or 0  -- Keep mostly opaque
 					}):Play()
 				end
 			end
