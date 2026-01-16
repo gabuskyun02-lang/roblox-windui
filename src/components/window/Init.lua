@@ -661,7 +661,7 @@ return function(Config)
         Window.AcrylicPaint and Window.AcrylicPaint.Frame or nil,
         Blur,
         Creator.NewRoundFrame(Window.UICorner, "Squircle", {
-            ImageTransparency = 1, -- Window.Transparent and 0.25 or 0
+            ImageTransparency = 0, -- Solid by default, acrylic toggle will adjust
             Size = UDim2.new(1,0,1,-240),
             AnchorPoint = Vector2.new(0.5,0.5),
             Position = UDim2.new(0.5,0,0.5,0),

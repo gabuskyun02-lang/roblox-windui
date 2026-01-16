@@ -187,7 +187,28 @@ end
 function WindUI:ToggleAcrylic(Value)
 	if WindUI.Window and WindUI.Window.AcrylicPaint and WindUI.Window.AcrylicPaint.Model then
 		WindUI.Window.Acrylic = Value
-		WindUI.Window.AcrylicPaint.Model.Transparency = Value and 0.98 or 1
+		WindUI.Window.AcrylicPaint.Model.Transparency = Value and 0.85 or 1
+		
+		-- Adjust UI background transparency to show blur through
+		local mainUI = WindUI.Window.UIElements
+		if mainUI and mainUI.Main then
+			-- Find Background and adjust transparency
+			local bg = mainUI.Main:FindFirstChild("Background")
+			if bg then
+				Creator.Tween(bg, 0.2, {
+					ImageTransparency = Value and 0.15 or 0
+				}):Play()
+			end
+			
+			-- Adjust sidebar transparency for glassmorphism
+			local sidebar = mainUI.SideBarContainer
+			if sidebar then
+				Creator.Tween(sidebar, 0.2, {
+					BackgroundTransparency = Value and 0.3 or 0
+				}):Play()
+			end
+		end
+		
 		if Value then
 			Acrylic.Enable()
 		else

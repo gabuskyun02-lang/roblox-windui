@@ -37,6 +37,7 @@ local Window = WindUI:CreateWindow({
     Folder = "bladeball",
     Icon = "feather",
     NewElements = true,
+    Acrylic = true, -- Enable acrylic for toggle to work
     Size = UDim2.fromOffset(540, 400), -- Compact glassmorphism size
     
     HideSearchBar = false,
