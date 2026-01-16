@@ -10,25 +10,22 @@ local Acrylic = {
 }
 
 function Acrylic.init()
-	local baseEffect = Instance.new("DepthOfFieldEffect")
-	baseEffect.FarIntensity = 0
-	baseEffect.InFocusRadius = 0.1
-	baseEffect.NearIntensity = 1
+	-- DepthOfFieldEffect DISABLED - was affecting game world and player nametags
+	-- Only Glass Part and UI transparency are used for glassmorphism effect
+	
+	-- local baseEffect = Instance.new("DepthOfFieldEffect")
+	-- baseEffect.FarIntensity = 0
+	-- baseEffect.InFocusRadius = 10
+	-- baseEffect.NearIntensity = 0.3
 
 	local depthOfFieldDefaults = {}
 
 	function Acrylic.Enable()
-		for _, effect in pairs(depthOfFieldDefaults) do
-			effect.Enabled = false
-		end
-		baseEffect.Parent = cloneref(game:GetService("Lighting"))
+		-- Disabled: no longer using DepthOfField
 	end
 
 	function Acrylic.Disable()
-		for _, effect in pairs(depthOfFieldDefaults) do
-			effect.Enabled = effect.enabled
-		end
-		baseEffect.Parent = nil
+		-- Disabled: no longer using DepthOfField
 	end
 
 	local function registerDefaults()
@@ -50,7 +47,6 @@ function Acrylic.init()
 	end
 
 	registerDefaults()
-	Acrylic.Enable()
 end
 
 return Acrylic
