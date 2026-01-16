@@ -10178,7 +10178,10 @@ ap.IconThemed
 )
 
 aq.Size=UDim2.new(0,ap.IconSize,0,ap.IconSize)
+
+if aq:FindFirstChild"ImageLabel"then
 aq.ImageLabel.ImageTransparency=.25
+end
 end
 
 local ar=af("Frame",{
@@ -10899,8 +10902,8 @@ Topbar=at.Topbar or{Height=52,ButtonsType="Default"},
 
 Size=at.Size,
 
-MinSize=at.MinSize or Vector2.new(480,320),
-MaxSize=at.MaxSize or Vector2.new(750,520),
+MinSize=at.MinSize or Vector2.new(400,280),
+MaxSize=at.MaxSize or Vector2.new(1200,800),
 
 TopBarButtonIconSize=at.TopBarButtonIconSize,
 
