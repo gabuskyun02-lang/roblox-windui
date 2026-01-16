@@ -3249,47 +3249,43 @@ AcrylicPaint=a.load'r',
 }
 
 function ab.init()
-local ac=Instance.new"DepthOfFieldEffect"
-ac.FarIntensity=0
-ac.InFocusRadius=0.1
-ac.NearIntensity=1
 
-local ad={}
+
+
+
+
+
+
+
+local ac={}
 
 function ab.Enable()
-for ae,af in pairs(ad)do
-af.Enabled=false
-end
-ac.Parent=aa(game:GetService"Lighting")
+
 end
 
 function ab.Disable()
-for ae,af in pairs(ad)do
-af.Enabled=af.enabled
-end
-ac.Parent=nil
+
 end
 
 local function registerDefaults()
-local function register(ae)
-if ae:IsA"DepthOfFieldEffect"then
-ad[ae]={enabled=ae.Enabled}
+local function register(ad)
+if ad:IsA"DepthOfFieldEffect"then
+ac[ad]={enabled=ad.Enabled}
 end
 end
 
-for ae,af in pairs(aa(game:GetService"Lighting"):GetChildren())do
-register(af)
+for ad,ae in pairs(aa(game:GetService"Lighting"):GetChildren())do
+register(ae)
 end
 
 if aa(game:GetService"Workspace").CurrentCamera then
-for ae,af in pairs(aa(game:GetService"Workspace").CurrentCamera:GetChildren())do
-register(af)
+for ad,ae in pairs(aa(game:GetService"Workspace").CurrentCamera:GetChildren())do
+register(ae)
 end
 end
 end
 
 registerDefaults()
-ab.Enable()
 end
 
 return ab end function a.t()
