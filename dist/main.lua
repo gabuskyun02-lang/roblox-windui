@@ -7204,7 +7204,8 @@ al(aw.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
 al(aw.UIElements.TabItem.Highlight,0.1,{ImageTransparency=1}):Play()
 al(aw.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0.6}):Play()
 if aw.UIElements.TabIcon then
-al(aw.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0.6}):Play()
+local az=aw.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then al(az,0.1,{ImageTransparency=0.6}):Play()end
 end
 
 aw.UIElements.TabItem.Active=false
@@ -7215,14 +7216,16 @@ al(aw.UIElements.TabItem,0.1,{ImageTransparency=0.95}):Play()
 al(aw.UIElements.TabItem.Highlight,0.1,{ImageTransparency=0.75}):Play()
 al(aw.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0}):Play()
 if aw.UIElements.TabIcon then
-al(aw.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0}):Play()
+local az=aw.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then al(az,0.1,{ImageTransparency=0}):Play()end
 end
 else
 al(aw.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
 al(aw.UIElements.TabItem.Highlight,0.1,{ImageTransparency=1}):Play()
 al(aw.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=aq=="Dropdown"and 0.4 or 0.05}):Play()
 if aw.UIElements.TabIcon then
-al(aw.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=aq=="Dropdown"and 0.2 or 0}):Play()
+local az=aw.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then al(az,0.1,{ImageTransparency=aq=="Dropdown"and 0.2 or 0}):Play()end
 end
 end
 
@@ -7284,7 +7287,8 @@ am.Window.Folder,
 true
 )
 ay.Size=UDim2.new(0,ax.IconSize or ao.TabIcon,0,ax.IconSize or ao.TabIcon)
-ay.ImageLabel.ImageTransparency=aq=="Dropdown"and.2 or 0
+local az=ay:FindFirstChild"ImageLabel"
+if az then az.ImageTransparency=aq=="Dropdown"and.2 or 0 end
 ax.UIElements.TabIcon=ay
 end
 ax.UIElements.TabItem=aj.NewRoundFrame(ao.MenuCorner-ao.MenuPadding,"Squircle",{
@@ -7386,7 +7390,8 @@ FillDirection="Vertical",
 if ax.Locked then
 ax.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=0.6
 if ax.UIElements.TabIcon then
-ax.UIElements.TabIcon.ImageLabel.ImageTransparency=0.6
+local az=ax.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then az.ImageTransparency=0.6 end
 end
 end
 
@@ -7422,7 +7427,8 @@ ax.UIElements.TabItem.ImageTransparency=.95
 ax.UIElements.TabItem.Highlight.ImageTransparency=.75
 ax.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=0
 if ax.UIElements.TabIcon then
-ax.UIElements.TabIcon.ImageLabel.ImageTransparency=0
+local az=ax.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then az.ImageTransparency=0 end
 end
 end
 
@@ -7441,7 +7447,8 @@ al(ax.UIElements.TabItem,0.1,{ImageTransparency=.95}):Play()
 al(ax.UIElements.TabItem.Highlight,0.1,{ImageTransparency=.75}):Play()
 al(ax.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0}):Play()
 if ax.UIElements.TabIcon then
-al(ax.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0}):Play()
+local az=ax.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then al(az,0.1,{ImageTransparency=0}):Play()end
 end
 table.insert(an.Value,ax.Original)
 else
@@ -7453,7 +7460,8 @@ al(ax.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
 al(ax.UIElements.TabItem.Highlight,0.1,{ImageTransparency=1}):Play()
 al(ax.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=.4}):Play()
 if ax.UIElements.TabIcon then
-al(ax.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=.2}):Play()
+local az=ax.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then al(az,0.1,{ImageTransparency=.2}):Play()end
 end
 
 for az,aA in next,an.Value do
@@ -7469,7 +7477,8 @@ al(aA.UIElements.TabItem,0.1,{ImageTransparency=1}):Play()
 al(aA.UIElements.TabItem.Highlight,0.1,{ImageTransparency=1}):Play()
 al(aA.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=.4}):Play()
 if aA.UIElements.TabIcon then
-al(aA.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=.2}):Play()
+local aB=aA.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if aB then al(aB,0.1,{ImageTransparency=.2}):Play()end
 end
 aA.Selected=false
 end
@@ -7478,7 +7487,8 @@ al(ax.UIElements.TabItem,0.1,{ImageTransparency=.95}):Play()
 al(ax.UIElements.TabItem.Highlight,0.1,{ImageTransparency=.75}):Play()
 al(ax.UIElements.TabItem.Frame.Title.TextLabel,0.1,{TextTransparency=0}):Play()
 if ax.UIElements.TabIcon then
-al(ax.UIElements.TabIcon.ImageLabel,0.1,{ImageTransparency=0}):Play()
+local az=ax.UIElements.TabIcon:FindFirstChild"ImageLabel"
+if az then al(az,0.1,{ImageTransparency=0}):Play()end
 end
 an.Value=ax.Original
 end
@@ -10293,7 +10303,8 @@ ah(as,0.33,{
 Size=UDim2.new(1,0,0,ap.HeaderSize+(as.Content.AbsoluteSize.Y/an))
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 
-ah(ar.ImageLabel,0.1,{Rotation=180},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local au=ar:FindFirstChild"ImageLabel"
+if au then ah(au,0.1,{Rotation=180},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()end
 end
 end
 function ap.Close(at)
@@ -10302,7 +10313,8 @@ ap.Opened=false
 ah(as,0.26,{
 Size=UDim2.new(1,0,0,ap.HeaderSize)
 },Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
-ah(ar.ImageLabel,0.1,{Rotation=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+local au=ar:FindFirstChild"ImageLabel"
+if au then ah(au,0.1,{Rotation=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()end
 end
 end
 
@@ -11712,12 +11724,15 @@ B,
 G.Size=au.Topbar.ButtonsType=="Default"and UDim2.new(0,F or au.TopBarButtonIconSize,0,F or au.TopBarButtonIconSize)or UDim2.new(0,0,0,0)
 G.AnchorPoint=Vector2.new(0.5,0.5)
 G.Position=UDim2.new(0.5,0,0.5,0)
-G.ImageLabel.ImageTransparency=au.Topbar.ButtonsType=="Default"and 0 or 1
+local H=G:FindFirstChild"ImageLabel"
+if H then
+H.ImageTransparency=au.Topbar.ButtonsType=="Default"and 0 or 1
 if au.Topbar.ButtonsType~="Default"then
-G.ImageLabel.ImageColor3=al.GetTextColorForHSB(C)
+H.ImageColor3=al.GetTextColorForHSB(C)
+end
 end
 
-local H=al.NewRoundFrame(au.Topbar.ButtonsType=="Default"and au.UICorner-(au.UIPadding/2)or 999,"Squircle",{
+local J=al.NewRoundFrame(au.Topbar.ButtonsType=="Default"and au.UICorner-(au.UIPadding/2)or 999,"Squircle",{
 Size=au.Topbar.ButtonsType=="Default"and UDim2.new(0,au.Topbar.Height-16,0,au.Topbar.Height-16)or UDim2.new(0,14,0,14),
 LayoutOrder=A or 999,
 Parent=au.Topbar.ButtonsType=="Default"and au.UIElements.Main.Main.Topbar.Right or nil,
@@ -11762,43 +11777,43 @@ BackgroundTransparency=1,
 Parent=au.Topbar.ButtonsType~="Default"and au.UIElements.Main.Main.Topbar.Right or nil,
 LayoutOrder=A or 999
 },{
-au.Topbar.ButtonsType~="Default"and H or nil,
+au.Topbar.ButtonsType~="Default"and J or nil,
 })
 
 
 
 au.TopBarButtons[100-A]={
 Name=v,
-Object=H
+Object=J
 }
 
-al.AddSignal(H.MouseButton1Click,function()
+al.AddSignal(J.MouseButton1Click,function()
 z()
 end)
-al.AddSignal(H.MouseEnter,function()
+al.AddSignal(J.MouseEnter,function()
 if au.Topbar.ButtonsType=="Default"then
-an(H,.15,{ImageTransparency=.93}):Play()
-an(H.Outline,.15,{ImageTransparency=.75}):Play()
+an(J,.15,{ImageTransparency=.93}):Play()
+an(J.Outline,.15,{ImageTransparency=.75}):Play()
 
 else
 
-an(G.ImageLabel,.1,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if H then an(H,.1,{ImageTransparency=0},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()end
 an(G,.1,{Size=UDim2.new(0,F or au.TopBarButtonIconSize,0,F or au.TopBarButtonIconSize)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end)
-al.AddSignal(H.InputEnded,function()
+al.AddSignal(J.InputEnded,function()
 if au.Topbar.ButtonsType=="Default"then
-an(H,.1,{ImageTransparency=1}):Play()
-an(H.Outline,.1,{ImageTransparency=1}):Play()
+an(J,.1,{ImageTransparency=1}):Play()
+an(J.Outline,.1,{ImageTransparency=1}):Play()
 
 else
 
-an(G.ImageLabel,.1,{ImageTransparency=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
+if H then an(H,.1,{ImageTransparency=1},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()end
 an(G,.1,{Size=UDim2.new(0,0,0,0)},Enum.EasingStyle.Quint,Enum.EasingDirection.Out):Play()
 end
 end)
 
-return H
+return J
 end
 
 
