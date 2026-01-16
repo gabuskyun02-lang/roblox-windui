@@ -9760,14 +9760,16 @@ ap.IconThemed,
 "TabIcon"
 )
 as.Size=UDim2.new(0,16,0,16)
-if ap.IconColor and as:FindFirstChild"ImageLabel"then
-as.ImageLabel.ImageColor3=ap.IconColor
+if ap.IconColor then
+local au=as:FindFirstChild"ImageLabel"
+if au then au.ImageColor3=ap.IconColor end
 end
 if not ap.IconShape then
 as.Parent=ap.UIElements.Main.Frame
 ap.UIElements.Icon=as
-if as:FindFirstChild"ImageLabel"then
-as.ImageLabel.ImageTransparency=not ap.Locked and 0 or.7
+local au=as:FindFirstChild"ImageLabel"
+if au then
+au.ImageTransparency=not ap.Locked and 0 or.7
 end
 ar=-18-(Window.UIPadding/2)
 ap.UIElements.Main.Frame.TextLabel.Size=UDim2.new(1,ar,0,0)
@@ -9803,9 +9805,10 @@ Name="Outline"
 })
 as.AnchorPoint=Vector2.new(0.5,0.5)
 as.Position=UDim2.new(0.5,0,0.5,0)
-if as:FindFirstChild"ImageLabel"then
-as.ImageLabel.ImageTransparency=0
-as.ImageLabel.ImageColor3=af.GetTextColorForHSB(ap.IconColor,0.68)
+local au=as:FindFirstChild"ImageLabel"
+if au then
+au.ImageTransparency=0
+au.ImageColor3=af.GetTextColorForHSB(ap.IconColor,0.68)
 end
 ar=-28-(Window.UIPadding/2)
 ap.UIElements.Main.Frame.TextLabel.Size=UDim2.new(1,ar,0,0)
@@ -9825,8 +9828,9 @@ true,
 ap.IconThemed
 )
 at.Size=UDim2.new(0,16,0,16)
-if at:FindFirstChild"ImageLabel"then
-at.ImageLabel.ImageTransparency=not ap.Locked and 0 or.7
+local au=at:FindFirstChild"ImageLabel"
+if au then
+au.ImageTransparency=not ap.Locked and 0 or.7
 end
 ar=-30
 
@@ -10215,8 +10219,9 @@ ap.IconThemed
 
 aq.Size=UDim2.new(0,ap.IconSize,0,ap.IconSize)
 
-if aq:FindFirstChild"ImageLabel"then
-aq.ImageLabel.ImageTransparency=.25
+local ar=aq:FindFirstChild"ImageLabel"
+if ar then
+ar.ImageTransparency=.25
 end
 end
 
