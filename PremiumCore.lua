@@ -43,15 +43,22 @@ local UserInputService = Services.UserInputService
 local CollectionService = Services.CollectionService
 local ReplicatedStorage = Services.ReplicatedStorage
 
--- Game Modules
+-- Game Modules (loaded synchronously to avoid race condition)
 local ValueModule = nil
 local ItemLoot = nil
-task.spawn(function()
+local modulesLoaded = false
+
+local function ensureModulesLoaded()
+    if modulesLoaded then return end
     pcall(function()
         ValueModule = require(ReplicatedStorage.Shared.Core.Value)
         ItemLoot = require(ReplicatedStorage.Shared.Data.item_loot)
     end)
-end)
+    modulesLoaded = true
+end
+
+-- Defer loading to first use (lazy but safe)
+task.defer(ensureModulesLoaded)
 
 -- Helper: Format Number
 local function FormatNumber(n)
@@ -127,7 +134,6 @@ local CONSTANTS = table.freeze({
     
     -- Rate limiting defaults
     RATE_LIMIT = table.freeze({
-        MIN_INTERVAL = 0.15,
         MAX_PER_MINUTE = 35,
         JITTER = 0.08
     }),
@@ -278,6 +284,7 @@ StateManager.define({
     autoEvacuateFloor = { default = 30, type = "number" },   -- Floor to Evacuate
     autoDungeonIdleTime = { default = 0, type = "number" },  -- Internal tracking
     lastVoteTime = { default = 0, type = "number" },         -- Internal tracking
+    autoDungeonHasVoted = { default = false, type = "boolean" }, -- KILO Fix: Prevent vote spam
     
     -- Visuals
     fullbright = { default = false, type = "boolean" },
@@ -285,7 +292,7 @@ StateManager.define({
     -- Stats (read-only tracking)
     itemsCollected = { default = 0, type = "number" },
     currentFloor = { default = 0, type = "number" },
-    startTime = { default = tick(), type = "number" },
+    startTime = { default = os.clock(), type = "number" },
     
     -- Notifications
     notifications = { default = true, type = "boolean" },
@@ -337,19 +344,6 @@ do
         end
     })
     
-    if refs.player then
-        refs.player.CharacterAdded:Connect(function(char)
-            refs.character = char
-            -- Fix: Added timeout (5s) to prevent infinite yield
-            refs.humanoid = char:WaitForChild("Humanoid", 5)
-            refs.rootPart = char:WaitForChild("HumanoidRootPart", 5)
-            
-            -- Fallback if waiting failed (e.g. lag or custom character)
-            if not refs.humanoid then
-                 warn("[PlayerRefs] Humanoid not found after timeout") 
-            end
-        end)
-    end
 end
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -365,7 +359,7 @@ do
     local COOLDOWN = 60 / CONSTANTS.RATE_LIMIT.MAX_PER_MINUTE 
 
     function RateLimiter.canFire(remoteName)
-        local now = tick()
+        local now = os.clock()
         local last = lastFireTimes[remoteName] or 0
         
         -- Enforce strict spacing to prevent server-side flags
@@ -376,7 +370,7 @@ do
     end
     
     function RateLimiter.recordFire(remoteName)
-        lastFireTimes[remoteName] = tick()
+        lastFireTimes[remoteName] = os.clock()
     end
     
     function RateLimiter.getStats()
@@ -385,6 +379,88 @@ do
             stats[name] = { lastFire = time }
         end
         return stats
+    end
+end
+
+-- ═══════════════════════════════════════════════════════════════════
+-- § SECTION 5.5: UNIFIED HOOK MANAGER (KILO-ZERO Fix #2)
+-- Prevents hook conflicts by centralizing all __namecall hooks
+-- ═══════════════════════════════════════════════════════════════════
+
+local HookManager = {}
+do
+    local hooks = {}  -- { name -> { condition = fn, handler = fn } }
+    local originalNamecall = nil
+    local installed = false
+    
+    -- Register a hook handler
+    function HookManager.register(name, conditionFn, handlerFn)
+        hooks[name] = { condition = conditionFn, handler = handlerFn }
+        
+        -- Auto-install on first registration
+        if not installed then
+            HookManager.install()
+        end
+    end
+    
+    -- Unregister a hook handler
+    function HookManager.unregister(name)
+        hooks[name] = nil
+    end
+    
+    -- Install the unified hook
+    function HookManager.install()
+        if installed then return true end
+        
+        local success = pcall(function()
+            if hookmetamethod and type(hookmetamethod) == "function" then
+                originalNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+                    local method = getnamecallmethod()
+                    local args = {...}
+                    
+                    -- Dispatch to all registered hooks
+                    for name, hook in pairs(hooks) do
+                        if hook.condition(method, self, args) then
+                            local result = hook.handler(self, method, args)
+                            if result ~= nil then
+                                return result
+                            end
+                        end
+                    end
+                    
+                    return originalNamecall(self, ...)
+                end)
+            else
+                -- Legacy fallback
+                local mt = getrawmetatable(game)
+                originalNamecall = mt.__namecall
+                setreadonly(mt, false)
+                
+                mt.__namecall = newcclosure(function(self, ...)
+                    local method = getnamecallmethod()
+                    local args = {...}
+                    
+                    for name, hook in pairs(hooks) do
+                        if hook.condition(method, self, args) then
+                            local result = hook.handler(self, method, args)
+                            if result ~= nil then
+                                return result
+                            end
+                        end
+                    end
+                    
+                    return originalNamecall(self, ...)
+                end)
+                setreadonly(mt, true)
+            end
+        end)
+        
+        installed = success
+        return success
+    end
+    
+    function HookManager.isInstalled()
+        return installed
     end
 end
 
@@ -549,9 +625,15 @@ do
             return isMon, type, data
         end
         
-        -- 2. Direct name match (fastest)
+        -- 2. Direct name match - OPTIMIZED: O(1) exact match first, then O(n) pattern match
+        -- Step A: Exact match (fastest, O(1))
+        if monsterSet[name] then
+            return returnCached(true, name)
+        end
+        
+        -- Step B: Pattern match only if exact match fails (slower, O(n))
         for id in pairs(monsterSet) do
-            if name:find(id) then
+            if name:find(id, 1, true) then  -- plain match, no regex overhead
                 return returnCached(true, id)
             end
         end
@@ -753,8 +835,8 @@ do
             end)
             tween:Play()
             
-            local start = tick()
-            while not completed and tick() - start < (duration + 0.5) do
+            local start = os.clock()
+            while not completed and os.clock() - start < (duration + 0.5) do
                 task.wait()
             end
             if conn then conn:Disconnect() end
@@ -1513,12 +1595,13 @@ do
                 end
 
                 
-                if foundCount > 0 then
+                if foundCount > 0 and os.clock() - (lastNPCWarnTime or 0) > 5 then
                     warn("[PremiumCore] Found " .. foundCount .. " active NPCs to save!")
+                    lastNPCWarnTime = os.clock()
                 end
             else
                 -- WARN ONCE per 5 seconds to avoid spam
-                if tick() % 5 < 1 then
+                if os.clock() % 5 < 1 then
                     warn("[PremiumCore] 'NPCModels' folder not found in Workspace!")
                 end
             end
@@ -1574,20 +1657,15 @@ do
              MovementEngine.teleport(offset)
              task.wait(0.2)
              
-             -- 2. Interact (Pickup) using TEvent directly
-             local TEvent = getTEvent()
-             if TEvent and TEvent.FireRemote then
-                 TEvent.FireRemote("Interactable", target.object)
-             else
-                 RemoteHandler.fireFast("Interactable", target.object)
-             end
+             -- 2. Interact (Pickup) using RemoteHandler (Fixed by KILO-ZERO consensus)
+             RemoteHandler.fireFast("Interactable", target.object)
              task.wait(0.5) -- Wait for attach/pickup
              
              -- 3. Teleport to Elevator (Delivery)
              local elevatorPos = AutoFarmSystem.getElevatorPosition()
              if elevatorPos then
                  MovementEngine.teleport(CFrame.new(elevatorPos) * CFrame.new(0, 3, 0))
-                 StatusParagraph:SetTitle("Status: <font color='#00FFFF'>Delivering NPC...</font>")
+                 safeSetStatus("Status: <font color='#00FFFF'>Delivering NPC...</font>")
                  Notify({
                      Title = "Auto Save NPC",
                      Content = "Delivering to Elevator...",
@@ -1777,49 +1855,28 @@ do
     local hookInstalled = false
     local oldNamecall = nil
     
-    -- Method 1: Remote Blocking (Block 'SyncStaminaConsume')
+    -- Method 1: Remote Blocking via HookManager (Block 'SyncStaminaConsume')
     function AdvancedStaminaExploits.installRemoteBlock()
         if hookInstalled then return true end
         
-        local success = pcall(function()
-            -- Modern Hook (Undetectable)
-            if hookmetamethod and type(hookmetamethod) == "function" then
-                oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-                    local method = getnamecallmethod()
-                    local args = {...}
-                    
-                    if method == "FireServer" and remoteBlockActive then
-                         if tostring(self.Name) == "SyncStaminaConsume" or (args[1] and args[1] == "SyncStaminaConsume") then
-                             return nil
-                         end
-                    end
-                    
-                    return oldNamecall(self, ...)
-                end)
-            else
-                -- Legacy Fallback (2018-era)
-                local mt = getrawmetatable(game)
-                oldNamecall = mt.__namecall
-                setreadonly(mt, false)
-                
-                mt.__namecall = newcclosure(function(self, ...)
-                    local args = {...}
-                    local method = getnamecallmethod()
-                    
-                    if method == "FireServer" and remoteBlockActive then
-                        if tostring(self.Name) == "SyncStaminaConsume" or (args[1] and args[1] == "SyncStaminaConsume") then
-                            return nil
-                        end
-                    end
-                    
-                    return oldNamecall(self, ...)
-                end)
-                setreadonly(mt, true)
+        -- Use unified HookManager instead of installing separate hook
+        HookManager.register("StaminaBlock", 
+            -- Condition: Check if this is a stamina consume remote
+            function(method, self, args)
+                if method == "FireServer" and remoteBlockActive then
+                    if tostring(self.Name) == "SyncStaminaConsume" then return true end
+                    if args[1] and args[1] == "SyncStaminaConsume" then return true end
+                end
+                return false
+            end,
+            -- Handler: Block by returning nil
+            function(self, method, args)
+                return nil
             end
-        end)
+        )
         
-        hookInstalled = success
-        return success
+        hookInstalled = true
+        return true
     end
     
     function AdvancedStaminaExploits.setRemoteBlock(enabled)
@@ -2175,7 +2232,7 @@ do
     end
     
     function DungeonExploits.useTool()
-        return RemoteHandler.fire("Hotbar_Use", 1)
+        return RemoteHandler.fire("UseTool", 1)  -- KILO Fix: Correct remote name
     end
     
     function DungeonExploits.switchSlot(slot)
@@ -2255,47 +2312,26 @@ do
     function SanityProtection.install()
         if hookInstalled then return true end
         
-        local success = pcall(function()
-            -- Modern Hook (Undetectable)
-            if hookmetamethod and type(hookmetamethod) == "function" then
-                oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-                    local method = getnamecallmethod()
-                    local args = {...}
-                    
-                    if method == "FireServer" and blockSight then
-                        if tostring(self.Name) == "SeeSomething" then return nil end
-                        for _, arg in pairs(args) do
-                            if type(arg) == "string" and arg == "SeeSomething" then return nil end
-                        end
+        -- Use unified HookManager instead of installing separate hook
+        HookManager.register("SanityBlock", 
+            -- Condition: Check if this is a sanity sight remote
+            function(method, self, args)
+                if method == "FireServer" and blockSight then
+                    if tostring(self.Name) == "SeeSomething" then return true end
+                    for _, arg in pairs(args) do
+                        if type(arg) == "string" and arg == "SeeSomething" then return true end
                     end
-                    
-                    return oldNamecall(self, ...)
-                end)
-            else
-                -- Legacy Fallback
-                local mt = getrawmetatable(game)
-                oldNamecall = mt.__namecall
-                setreadonly(mt, false)
-                
-                mt.__namecall = newcclosure(function(self, ...)
-                    local args = {...}
-                    local method = getnamecallmethod()
-                    
-                    if method == "FireServer" and blockSight then
-                        if tostring(self.Name) == "SeeSomething" then return nil end
-                        for _, arg in pairs(args) do
-                            if type(arg) == "string" and arg == "SeeSomething" then return nil end
-                        end
-                    end
-                    
-                    return oldNamecall(self, ...)
-                end)
-                setreadonly(mt, true)
+                end
+                return false
+            end,
+            -- Handler: Block by returning nil
+            function(self, method, args)
+                return nil
             end
-        end)
+        )
         
-        hookInstalled = success
-        return success
+        hookInstalled = true
+        return true
     end
     
     function SanityProtection.setEnabled(enabled)
@@ -2637,6 +2673,35 @@ local StatsParagraph = StatsSection:Paragraph({
     Title = "Items: 0 | IPM: 0.0 | Floor: 0"
 })
 
+-- Safe UI update wrappers to prevent WindUI chain errors (KILO Fix)
+local lastStatusUpdate = 0
+local function safeSetStatus(title)
+    if not StatusParagraph then return end
+    if os.clock() - lastStatusUpdate < 0.5 then return end  -- Throttle: max 2 updates/sec
+    
+    local success = pcall(function()
+        StatusParagraph:SetTitle(title)
+    end)
+    
+    if success then
+        lastStatusUpdate = os.clock()
+    end
+end
+
+local lastStatsUpdate = 0
+local function safeSetStats(title)
+    if not StatsParagraph then return end
+    if os.clock() - lastStatsUpdate < 0.3 then return end  -- Throttle stats updates
+    
+    local success = pcall(function()
+        StatsParagraph:SetTitle(title)
+    end)
+    
+    if success then
+        lastStatsUpdate = os.clock()
+    end
+end
+
 StatsSection:Button({
     Title = "🚨 PANIC (Emergency Stop)",
     Callback = function()
@@ -2752,13 +2817,23 @@ FarmImpSection:Toggle({
     end
 })
 
+-- Thread tracking for True Safety
+local trueSafetyThread = nil
+
 FarmImpSection:Toggle({
     Title = "True Safety (Elevator Spoof)",
     Default = false,
     Callback = function(state)
         StateManager.set("elevatorSafety", state)
+        
+        -- Cancel existing thread if disabling
+        if not state and trueSafetyThread then
+            pcall(function() task.cancel(trueSafetyThread) end)
+            trueSafetyThread = nil
+        end
+        
         if state then
-            task.spawn(function()
+            trueSafetyThread = task.spawn(function()
                 local success, TEvent = pcall(function() return require(game:GetService("ReplicatedStorage").Shared.Core.TEvent) end)
                 if not success then 
                     warn("Failed to require TEvent") 
@@ -2986,8 +3061,8 @@ AutoDungeonSection:Toggle({
 })
 
 AutoDungeonSection:Slider({
-    Title = "Max Floor Target",
-    Desc = "Floor to trigger evacuation",
+    Title = "🚨 Evacuation Floor",
+    Desc = "Auto-evacuate when reaching this floor",
     Value = {
         Min = 1,
         Max = 35,
@@ -3049,7 +3124,8 @@ ElevatorSection:Toggle({
 })
 
 ElevatorSection:Slider({
-    Title = "Max Floor Target",
+    Title = "🛗 Safety Floor Limit",
+    Desc = "Max floor for elevator safety features",
     Value = { Min = 1, Max = 50, Default = 30 },
     Callback = function(value)
         StateManager.set("maxFloorTarget", value)
@@ -3632,7 +3708,7 @@ ConnectionPool.spawn(function()
             if StateManager.get("safeMode") then
                 local monsterNearby = AutoFarmSystem.isMonsterNearby(50)
                 if monsterNearby then
-                    StatusParagraph:SetTitle("Status: <font color='#FF0000'>⚠️ Retreating (Monster)</font>")
+                    safeSetStatus("Status: <font color='#FF0000'>⚠️ Retreating (Monster)</font>")
                     -- Retreat to Elevator
                     MovementEngine.teleport(CFrame.new(AutoFarmSystem.getElevatorPosition()) * CFrame.new(0, 5, 0))
                     task.wait(3) -- Stay safe at elevator for a moment
@@ -3647,7 +3723,7 @@ ConnectionPool.spawn(function()
             
             -- Auto-sell when full
             if InventoryManager.isFull() then
-                StatusParagraph:SetTitle("Status: <font color='#8A2BE2'>Banking Items...</font>")
+                safeSetStatus("Status: <font color='#8A2BE2'>Banking Items...</font>")
                 
                 -- Teleport to Elevator (Banking Zone)
                 MovementEngine.teleport(CFrame.new(AutoFarmSystem.getElevatorPosition()) * CFrame.new(0, 3, 0))
@@ -3659,7 +3735,7 @@ ConnectionPool.spawn(function()
                 
                 -- SANITY CHECK: Double check if we actually have items
                 if #filledSlots > 0 then
-                    StatusParagraph:SetTitle("Status: <font color='#8A2BE2'>Banking " .. #filledSlots .. " items...</font>")
+                    safeSetStatus("Status: <font color='#8A2BE2'>Banking " .. #filledSlots .. " items...</font>")
                     for _, slot in ipairs(filledSlots) do
                         RemoteHandler.fireFast("Hotbar_Switch", slot)
                         task.wait(0.15)
@@ -3670,11 +3746,11 @@ ConnectionPool.spawn(function()
                      -- False Positive from 'isFull' (likely 'HandsFull' UI bug)
                      -- Do NOT force drop. Just log and return to farming.
                      warn("[AutoFarm] Banking triggered but inventory empty. Ignoring.")
-                     StatusParagraph:SetTitle("Status: <font color='#FFA500'>Inventory Empty (False Alarm)</font>")
+                     safeSetStatus("Status: <font color='#FFA500'>Inventory Empty (False Alarm)</font>")
                      task.wait(1)
                 end
                 
-                StatusParagraph:SetTitle("Status: <font color='#00FF00'>Banking Complete</font>")
+                safeSetStatus("Status: <font color='#00FF00'>Banking Complete</font>")
                 task.wait(0.5)
                 return
             end
@@ -3704,13 +3780,13 @@ ConnectionPool.spawn(function()
                 -- Resets Idle Timer when working (CORRECT PLACE)
                 StateManager.set("autoDungeonIdleTime", 0)
 
-                StatusParagraph:SetTitle(string.format(
+                safeSetStatus(string.format(
                     "Status: <font color='#00FF00'>Farming %s</font>", 
                     target.name
                 ))
                 AutoFarmSystem.interact(target)
             else
-                StatusParagraph:SetTitle("Status: <font color='#892be2'>Searching... (Safe)</font>")
+                safeSetStatus("Status: <font color='#892be2'>Searching... (Safe)</font>")
                 MovementEngine.resetStuck()
                 
                 -- SAFETY: Retreat to Elevator while waiting for spawns
@@ -3726,23 +3802,25 @@ ConnectionPool.spawn(function()
                 local idleStart = StateManager.get("autoDungeonIdleTime")
                 local elapsed = 0
                 if idleStart > 0 then
-                    elapsed = tick() - idleStart
+                    elapsed = os.clock() - idleStart
                 end
                 
                 -- Update Status with Countdown if Auto Dungeon is On
                 if StateManager.get("autoDungeon") then
-                     StatusParagraph:SetTitle(string.format("Status: <font color='#892be2'>Searching... (%.1fs / 5.0s)</font>", elapsed))
+                     safeSetStatus(string.format("Status: <font color='#892be2'>Searching... (%.1fs / 5.0s)</font>", elapsed))
                 else
-                     StatusParagraph:SetTitle("Status: <font color='#892be2'>Searching... (Safe)</font>")
+                     safeSetStatus("Status: <font color='#892be2'>Searching... (Safe)</font>")
                 end
+
 
                 if StateManager.get("autoDungeon") then
                     if idleStart == 0 then
-                        StateManager.set("autoDungeonIdleTime", tick())
-                    elseif elapsed > 5 then
-                        -- Check for Vote Cooldown (10s)
+                        StateManager.set("autoDungeonIdleTime", os.clock())
+                        StateManager.set("autoDungeonHasVoted", false)  -- KILO Fix: Reset on new idle
+                    elseif elapsed > 5 and not StateManager.get("autoDungeonHasVoted") then  -- KILO Fix: Check flag
+                        -- Check for Vote Cooldown (30s - increased from 10s)
                         local lastVote = StateManager.get("lastVoteTime") or 0
-                        if (tick() - lastVote) > 10 then
+                        if (os.clock() - lastVote) > 30 then
                             -- Get Floor Data
                             local currentFloor = 0
                             pcall(function()
@@ -3756,14 +3834,16 @@ ConnectionPool.spawn(function()
                             
                             -- DECISION: Evacuate or Continue?
                             if StateManager.get("autoEvacuate") and currentFloor >= targetFloor then
-                                StatusParagraph:SetTitle("Status: <font color='#FF0000'>AUTO DUNGEON: Evacuating...</font>")
+                                safeSetStatus("Status: <font color='#FF0000'>AUTO DUNGEON: Evacuating...</font>")
                                 RemoteHandler.fire("SubmitVote", "retreat")
                                 Notify({Title = "Auto Dungeon", Content = "Goal Reached! Evacuating...", Duration = 5})
-                                StateManager.set("lastVoteTime", tick())
+                                StateManager.set("lastVoteTime", os.clock())
+                                StateManager.set("autoDungeonHasVoted", true)  -- KILO Fix: Mark as voted
                             elseif StateManager.get("autoGoDeep") then
-                                StatusParagraph:SetTitle("Status: <font color='#00FF00'>AUTO DUNGEON: Going Deep...</font>")
+                                safeSetStatus("Status: <font color='#00FF00'>AUTO DUNGEON: Going Deep...</font>")
                                 RemoteHandler.fire("SubmitVote", "continue")
-                                StateManager.set("lastVoteTime", tick())
+                                StateManager.set("lastVoteTime", os.clock())
+                                StateManager.set("autoDungeonHasVoted", true)  -- KILO Fix: Mark as voted
                             end
                         end
                     end
@@ -3856,7 +3936,7 @@ ConnectionPool.spawn(function()
         
         pcall(function()
             local items = StateManager.get("itemsCollected")
-            local elapsed = tick() - StateManager.get("startTime")
+            local elapsed = os.clock() - StateManager.get("startTime")
             local ipm = items / math.max(elapsed / 60, 1)
             
             -- Get floor from DungeonStats (realtime)
@@ -3864,13 +3944,13 @@ ConnectionPool.spawn(function()
             local floor = dungeonData.level or StateManager.get("currentFloor")
             StateManager.set("currentFloor", floor)
             
-            StatsParagraph:SetTitle(string.format(
+            safeSetStats(string.format(
                 "Items: %d | IPM: %.1f | Floor: %d",
                 items, ipm, floor
             ))
             
             if not StateManager.get("farmActive") then
-                StatusParagraph:SetTitle("Status: <font color='#FFD700'>Idle</font>")
+                safeSetStatus("Status: <font color='#FFD700'>Idle</font>")
             end
             
             -- Update Internal HUD if visible
@@ -3939,37 +4019,48 @@ ConnectionPool.spawn(function()
         task.wait(1.5) -- Check every 1.5s
         
         if StateManager.get("autoOpenGiftBox") then
-            pcall(function()
+            local success, err = pcall(function()
                 local player = Players.LocalPlayer
                 local gui = player and player:FindFirstChild("PlayerGui")
                 local main = gui and gui:FindFirstChild("Main")
                 local home = main and main:FindFirstChild("HomePage")
                 local bottom = home and home:FindFirstChild("Bottom")
                 
-                if bottom then
-                    for _, slot in pairs(bottom:GetChildren()) do
-                        if slot:IsA("Frame") then
-                            local details = slot:FindFirstChild("ItemDetails")
-                            local name = details and details:FindFirstChild("ItemName")
+                if not bottom then
+                    warn("[AutoGiftBox] Bottom UI not found")
+                    return
+                end
+                
+                for _, slot in pairs(bottom:GetChildren()) do
+                    if slot:IsA("Frame") then
+                        local details = slot:FindFirstChild("ItemDetails")
+                        local nameLabel = details and details:FindFirstChild("ItemName")
+                        
+                        if nameLabel then
+                            -- FIXED: Case-insensitive, space-tolerant matching
+                            local itemName = nameLabel.Text:lower():gsub("%s+", "")
                             
-                            -- Check if slot has GiftBox
-                            if name and name.Text == "GiftBox" then
+                            if itemName:find("giftbox") or itemName:find("gift_box") then
                                 local slotNum = tonumber(slot.Name)
                                 if slotNum then
-                                    -- 1. Switch to slot
-                                    RemoteHandler.fire("Hotbar_Switch", slotNum)
+                                    -- FIXED: Use fireFast for immediate response
+                                    RemoteHandler.fireFast("Hotbar_Switch", slotNum)
                                     task.wait(0.3)
                                     
-                                    -- 2. Use Item (Try both Use and Activate logic)
-                                    RemoteHandler.fire("Hotbar_Use", 1)
-                                    task.wait(1.0) -- Wait for open
-                                    return -- One at a time
+                                    -- KILO Fix: UseTool (ID 472) is correct remote, not Hotbar_Use
+                                    RemoteHandler.fireFast("UseTool", slotNum)
+                                    task.wait(1.0) -- Wait for open animation
+                                    return -- Open one at a time
                                 end
                             end
                         end
                     end
                 end
             end)
+            
+            if not success then
+                warn("[AutoGiftBox] Critical Error: " .. tostring(err))
+            end
         end
     end
 end)
