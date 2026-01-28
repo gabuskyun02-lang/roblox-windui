@@ -4,7 +4,7 @@
     | |/ |/ / / _ \/ _  / /_/ // /  
     |__/|__/_/_//_/\_,_/\____/___/
     
-    v1.6.64  |  2026-01-22  |  Roblox UI Library for scripts
+    v1.6.64  |  2026-01-28  |  Roblox UI Library for scripts
     
     To view the source code, see the `src/` folder on the official GitHub repository.
     
@@ -2977,7 +2977,20 @@ local ac=ab.New
 
 
 local ad,ae=unpack(a.load'p')
-local af=Instance.new("Folder",aa(game:GetService"Workspace").CurrentCamera)
+
+
+local af
+local function getBlurFolder()
+if not af then
+local ag=aa(game:GetService"Workspace").CurrentCamera
+if ag then
+af=Instance.new"Folder"
+af.Name="WindUI Acrylic"
+af.Parent=ag
+end
+end
+return af
+end
 
 
 local function createAcrylic()
@@ -3012,66 +3025,69 @@ topRight=Vector2.new(),
 bottomRight=Vector2.new(),
 }
 local aj=createAcrylic()
-aj.Parent=af
+local ak=getBlurFolder()
+if ak then
+aj.Parent=ak
+end
 
-local function updatePositions(ak,al)
-ai.topLeft=al
-ai.topRight=al+Vector2.new(ak.X,0)
-ai.bottomRight=al+ak
+local function updatePositions(al,am)
+ai.topLeft=am
+ai.topRight=am+Vector2.new(al.X,0)
+ai.bottomRight=am+al
 end
 
 local function render()
-local ak=aa(game:GetService"Workspace").CurrentCamera
-if ak then
-ak=ak.CFrame
+local al=aa(game:GetService"Workspace").CurrentCamera
+if al then
+al=al.CFrame
 end
-local al=ak
-if not al then
-al=CFrame.new()
-end
-
 local am=al
-local an=ai.topLeft
-local ao=ai.topRight
-local ap=ai.bottomRight
+if not am then
+am=CFrame.new()
+end
 
-local aq=ad(an,ag)
+local an=am
+local ao=ai.topLeft
+local ap=ai.topRight
+local aq=ai.bottomRight
+
 local ar=ad(ao,ag)
 local as=ad(ap,ag)
+local at=ad(aq,ag)
 
-local at=(ar-aq).Magnitude
-local au=(ar-as).Magnitude
+local au=(as-ar).Magnitude
+local av=(as-at).Magnitude
 
 aj.CFrame=
-CFrame.fromMatrix((aq+as)/2,am.XVector,am.YVector,am.ZVector)
-aj.Mesh.Scale=Vector3.new(at,au,0)
+CFrame.fromMatrix((ar+at)/2,an.XVector,an.YVector,an.ZVector)
+aj.Mesh.Scale=Vector3.new(au,av,0)
 end
 
-local function onChange(ak)
-local al=ae()
-local am=ak.AbsoluteSize-Vector2.new(al,al)
-local an=ak.AbsolutePosition+Vector2.new(al/2,al/2)
+local function onChange(al)
+local am=ae()
+local an=al.AbsoluteSize-Vector2.new(am,am)
+local ao=al.AbsolutePosition+Vector2.new(am/2,am/2)
 
-updatePositions(am,an)
+updatePositions(an,ao)
 task.spawn(render)
 end
 
 local function renderOnChange()
-local ak=aa(game:GetService"Workspace").CurrentCamera
-if not ak then
+local al=aa(game:GetService"Workspace").CurrentCamera
+if not al then
 return
 end
 
-table.insert(ah,ak:GetPropertyChangedSignal"CFrame":Connect(render))
-table.insert(ah,ak:GetPropertyChangedSignal"ViewportSize":Connect(render))
-table.insert(ah,ak:GetPropertyChangedSignal"FieldOfView":Connect(render))
+table.insert(ah,al:GetPropertyChangedSignal"CFrame":Connect(render))
+table.insert(ah,al:GetPropertyChangedSignal"ViewportSize":Connect(render))
+table.insert(ah,al:GetPropertyChangedSignal"FieldOfView":Connect(render))
 task.spawn(render)
 end
 
 aj.Destroying:Connect(function()
-for ak,al in ah do
+for al,am in ah do
 pcall(function()
-al:Disconnect()
+am:Disconnect()
 end)
 end
 end)
@@ -12051,7 +12067,7 @@ function au.OnDestroy(z,A)
 au.OnDestroyCallback=A
 end
 
-if at.WindUI.UseAcrylic then
+if au.Acrylic then
 au.AcrylicPaint.AddParent(au.UIElements.Main)
 end
 
@@ -13030,7 +13046,7 @@ end
 function ae.ToggleAcrylic(ax,ay)
 if ae.Window and ae.Window.AcrylicPaint and ae.Window.AcrylicPaint.Model then
 ae.Window.Acrylic=ay
-ae.Window.AcrylicPaint.Model.Transparency=ay and 0.98 or 1
+ae.Window.AcrylicPaint.Model.Transparency=ay and 0.2 or 0.4
 
 
 local az=ae.Window.UIElements
@@ -13039,7 +13055,7 @@ if az and az.Main then
 local aA=az.Main:FindFirstChild"Background"
 if aA then
 ap.Tween(aA,0.2,{
-ImageTransparency=ay and 0.98 or 0
+ImageTransparency=ay and 0.2 or 0
 }):Play()
 end
 
@@ -13048,7 +13064,7 @@ if az.MainBar then
 local aB=az.MainBar:FindFirstChild"Background"
 if aB then
 ap.Tween(aB,0.2,{
-ImageTransparency=ay and 0.98 or 1
+ImageTransparency=ay and 0.2 or 0.4
 }):Play()
 end
 end
