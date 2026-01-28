@@ -1463,9 +1463,13 @@ do
         end
         
         -- Collect NPCs (Auto Save)
-        -- Collect NPCs (Auto Save)
         if StateManager.get("farmNPCs") then
-            local npcFolder = workspace:FindFirstChild("NPCModels")
+            local npcFolder = nil
+            local gameSys = workspace:FindFirstChild("GameSystem")
+            if gameSys then
+                npcFolder = gameSys:FindFirstChild("NPCModels")
+            end
+            
             if npcFolder then
                 local foundCount = 0
                 for _, npc in pairs(npcFolder:GetChildren()) do
@@ -1507,17 +1511,7 @@ do
                          end
                     end
                 end
-                                    object = npc,
-                                    name = npc.Name,
-                                    position = pos,
-                                    distance = (root.Position - pos).Magnitude,
-                                    priority = 100, -- Highest Priority (Save them first!)
-                                    type = "NPC"
-                                })
-                            end
-                        end
-                    end
-                end
+
                 
                 if foundCount > 0 then
                     warn("[PremiumCore] Found " .. foundCount .. " active NPCs to save!")
@@ -1552,20 +1546,42 @@ do
         
         -- SPECIAL LOGIC: NPC Delivery
         if target.type == "NPC" then
+             -- Check if NPC is still valid and enabled
+             if not target.object or not target.object.Parent then
+                 return false
+             end
+             
+             if not target.object:GetAttribute("en") then
+                 warn("[PremiumCore] NPC not enabled: " .. tostring(target.name))
+                 processedItems[target.object] = true
+                 return false
+             end
+             
              Notify({
                  Title = "Auto Save NPC",
-                 Content = "Found NPC: " .. tostring(target.name),
+                 Content = "Picking up: " .. tostring(target.name),
                  Duration = 2
              })
              
              -- 1. Teleport to NPC
-             local offset = CFrame.new(targetCFrame.Position) * CFrame.new(0, 3, 0)
+             local rootPart = target.object.PrimaryPart or target.object:FindFirstChild("HumanoidRootPart")
+             if not rootPart then
+                 processedItems[target.object] = true
+                 return false
+             end
+             
+             local offset = CFrame.new(rootPart.Position + Vector3.new(0, 10, 0))
              MovementEngine.teleport(offset)
              task.wait(0.2)
              
-             -- 2. Interact (Pickup)
-             RemoteHandler.fireFast("Interactable", target.object)
-             task.wait(0.5) -- Wait for attach
+             -- 2. Interact (Pickup) using TEvent directly
+             local TEvent = getTEvent()
+             if TEvent and TEvent.FireRemote then
+                 TEvent.FireRemote("Interactable", target.object)
+             else
+                 RemoteHandler.fireFast("Interactable", target.object)
+             end
+             task.wait(0.5) -- Wait for attach/pickup
              
              -- 3. Teleport to Elevator (Delivery)
              local elevatorPos = AutoFarmSystem.getElevatorPosition()
@@ -1578,6 +1594,15 @@ do
                      Duration = 1
                  })
                  task.wait(1.0) -- Wait for drop/save
+             end
+             
+             -- 4. Check if NPC was saved
+             if not target.object.Parent or not target.object:GetAttribute("en") then
+                 Notify({
+                     Title = "Auto Save NPC",
+                     Content = "NPC Saved: " .. tostring(target.name),
+                     Duration = 1
+                 })
              end
              
              processedItems[target.object] = true
@@ -2665,10 +2690,20 @@ FarmSection:Toggle({
 })
 
 FarmSection:Toggle({
-    Title = "🤖 Farm NPCs (Auto Save)",
-    Default = true,
+    Title = "Auto Farm NPCs",
+    Default = false,
     Callback = function(val)
-        StateManager.set("farmNPCs", val)
+        pcall(function()
+            StateManager.set("farmNPCs", val)
+        end)
+    end
+})
+
+FarmSection:Button({
+    Title = "Clear Ignored Items",
+    Callback = function()
+        AutoFarmSystem.clearProcessed()
+        Notify({Title = "System", Content = "Cache Cleared! Retrying...", Duration = 1})
     end
 })
 
@@ -2780,13 +2815,7 @@ FarmImpSection:Toggle({
     end
 })
 
-FarmSection:Button({
-    Title = "♻️ Clear Ignored Items",
-    Callback = function()
-        AutoFarmSystem.clearProcessed()
-        Notify({Title = "System", Content = "Cache Cleared! Retrying...", Duration = 1})
-    end
-})
+
 
 FarmImpSection:Slider({
     Title = "Interact Distance",
