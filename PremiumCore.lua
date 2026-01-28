@@ -50,11 +50,12 @@ local modulesLoaded = false
 
 local function ensureModulesLoaded()
     if modulesLoaded then return end
-    pcall(function()
-        ValueModule = require(ReplicatedStorage.Shared.Core.Value)
-        ItemLoot = require(ReplicatedStorage.Shared.Data.item_loot)
-    end)
-    modulesLoaded = true
+    -- FIX: Set modulesLoaded only on successful load (prevents false-positive)
+    local s1, v1 = pcall(function() return require(ReplicatedStorage.Shared.Core.Value) end)
+    local s2, v2 = pcall(function() return require(ReplicatedStorage.Shared.Data.item_loot) end)
+    if s1 then ValueModule = v1 end
+    if s2 then ItemLoot = v2 end
+    modulesLoaded = s1 and s2
 end
 
 -- Defer loading to first use (lazy but safe)
@@ -77,6 +78,8 @@ end
 local CONSTANTS = table.freeze({
     VERSION = "1.0.0",
     SESSION_ID = (function()
+        -- FIX: Add randomseed for unpredictable session IDs (Security Hardening)
+        math.randomseed(os.clock() * 1000000 + tick() % 1000)
         local chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         local len = #chars
         local id = {}
@@ -132,10 +135,13 @@ local CONSTANTS = table.freeze({
         "ItemOnFloorRatCave", "ItemOnFloorUnfinishedMap"
     }),
     
-    -- Rate limiting defaults
+    -- Rate limiting defaults (with Gaussian jitter support)
     RATE_LIMIT = table.freeze({
         MAX_PER_MINUTE = 35,
-        JITTER = 0.08
+        JITTER_MEAN = 0.08,      -- 80ms mean delay
+        JITTER_STDDEV = 0.05,    -- 50ms standard deviation
+        JITTER_MIN = 0.02,       -- 20ms minimum
+        JITTER_MAX = 0.20        -- 200ms maximum
     }),
     
     -- Elevator safe zone position
@@ -147,6 +153,19 @@ local CONSTANTS = table.freeze({
         NORMAL = 0.5,
         SLOW = 1.0,
         VERY_SLOW = 2.0
+    }),
+    
+    -- Thresholds (formerly magic numbers)
+    THRESHOLDS = table.freeze({
+        STUCK_DISTANCE = 1,           -- Minimum movement to not be "stuck" (studs)
+        STUCK_TIMEOUT = 5,            -- Seconds before anti-stuck triggers
+        ELEVATOR_EXCLUSION = 5,       -- Studs from elevator to ignore loot
+        VACUUM_SAFE_RADIUS = 8,       -- Studs from elevator for vacuum safety
+        VOTE_IDLE_THRESHOLD = 5,      -- Seconds idle before auto-voting
+        VOTE_COOLDOWN = 30,           -- Seconds between votes
+        BANKING_WAIT = 1.5,           -- Seconds to wait for banking
+        MONSTER_SAFE_RETREAT = 50,    -- Studs range for safe mode retreat
+        KILL_AURA_RANGE = 15          -- Studs range for kill aura
     })
 })
 
@@ -229,7 +248,9 @@ StateManager.define({
     smartPathing = { default = false, type = "boolean" },
     safeZoneLogic = { default = true, type = "boolean" },
     noLimitRadius = { default = false, type = "boolean" },
-    farmNPCs = { default = true, type = "boolean" },
+    -- FIX: Changed default from true to false to match UI toggle Default
+    -- This prevents state desync where internal state = true but UI shows false
+    farmNPCs = { default = false, type = "boolean" },
     elevatorSafety = { default = false, type = "boolean" },
     
     -- Movement
@@ -505,10 +526,16 @@ do
             return false, "TEvent not found"
         end
         
-        -- Add jitter for anti-detection
-        if CONSTANTS.RATE_LIMIT.JITTER > 0 then
-            task.wait(math.random() * CONSTANTS.RATE_LIMIT.JITTER)
+        -- Add jitter for anti-detection (Gaussian distribution for human-like timing)
+        local function gaussianJitter()
+            -- Box-Muller transform for Gaussian distribution
+            local u1, u2 = math.random(), math.random()
+            local gaussian = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
+            local jitter = gaussian * CONSTANTS.RATE_LIMIT.JITTER_STDDEV + CONSTANTS.RATE_LIMIT.JITTER_MEAN
+            return math.clamp(jitter, CONSTANTS.RATE_LIMIT.JITTER_MIN, CONSTANTS.RATE_LIMIT.JITTER_MAX)
         end
+        
+        task.wait(gaussianJitter())
         
         local args = {...}
         local success, err = pcall(function()
@@ -690,7 +717,7 @@ do
         
         local name = entity.Name
         for id in pairs(containerSet) do
-            if name:find(id) then
+            if name:find(id, 1, true) then  -- FIX: Plain text match (faster, no regex overhead)
                 return true
             end
         end
@@ -863,9 +890,9 @@ do
         local currentPos = root.Position
         local distance = (currentPos - lastPos).Magnitude
         
-        if distance < 1 then
+        if distance < CONSTANTS.THRESHOLDS.STUCK_DISTANCE then
             stuckTimer = stuckTimer + CONSTANTS.LOOP_INTERVALS.NORMAL
-            if stuckTimer >= 5 then
+            if stuckTimer >= CONSTANTS.THRESHOLDS.STUCK_TIMEOUT then
                 stuckTimer = 0
                 -- Random offset to unstuck
                 local offset = CFrame.new(
@@ -911,14 +938,8 @@ do
             
             if not home then return end
             
-            -- Check "Hands Full" indicator
-            local handsFull = home:FindFirstChild("HandsFull")
-            if handsFull and handsFull.Visible then
-                count = 4
-                return
-            end
-            
-            -- Count filled slots
+            -- FIX: Always count actual filled slots FIRST, not HandsFull indicator
+            -- HandsFull UI can bug out and show even when inventory is empty
             local bottom = home:FindFirstChild("Bottom")
             if bottom then
                 for _, slot in pairs(bottom:GetChildren()) do
@@ -931,6 +952,16 @@ do
                             end
                         end
                     end
+                end
+            end
+            
+            -- Only use HandsFull as secondary check if slot counting somehow failed
+            -- but we know UI is showing full warning
+            if count == 0 then
+                local handsFull = home:FindFirstChild("HandsFull")
+                if handsFull and handsFull.Visible then
+                    -- Don't force 4, just log this discrepancy
+                    warn("[InventoryManager] HandsFull visible but slots empty - UI bug detected")
                 end
             end
         end)
@@ -1169,11 +1200,14 @@ do
     
     function ESPSystem.update()
         -- Ensure folder exists and is in current camera
-        if not espFolder or not espFolder.Parent or espFolder.Parent ~= workspace.CurrentCamera then
-            if not espFolder then
-                espFolder = Instance.new("Folder")
-                espFolder.Name = "PremiumCore_ESP"
-            end
+        -- FIX: Destroy orphaned folder before creating new one
+        if espFolder and espFolder.Parent and espFolder.Parent ~= workspace.CurrentCamera then
+            espFolder:Destroy()
+            espFolder = nil
+        end
+        if not espFolder then
+            espFolder = Instance.new("Folder")
+            espFolder.Name = "PremiumCore_ESP"
             espFolder.Parent = workspace.CurrentCamera
         end
 
@@ -1182,12 +1216,13 @@ do
         
         local noLimit = StateManager.get("espNoLimit")
         
+        -- FIX: Collect entities to remove BEFORE modifying table (prevents undefined behavior)
+        local toRemove = {}
         for entity, data in pairs(espObjects) do
             -- Weak table auto-handling: keys (entities) that are destroyed 
             -- might still persist until GC runs. We double check Parent.
             if not entity or not entity.Parent then
-                if data.gui then data.gui:Destroy() end
-                espObjects[entity] = nil
+                table.insert(toRemove, entity)
             else
                 local pos = EntityDetector.getPosition(entity)
                 if pos then
@@ -1196,6 +1231,14 @@ do
                     data.gui.Enabled = noLimit or dist < 500
                 end
             end
+        end
+        
+        -- Now safely remove dead entities
+        for _, entity in ipairs(toRemove) do
+            if espObjects[entity] and espObjects[entity].gui then
+                espObjects[entity].gui:Destroy()
+            end
+            espObjects[entity] = nil
         end
     end
     
@@ -1395,6 +1438,9 @@ do
     -- Defined UPVALUE (Shared across all AutoFarmSystem functions)
     local processedItems = setmetatable({}, {__mode = "k"})
     local currentTarget = nil
+    
+    -- FIX: Local declaration for lastNPCWarnTime (was undeclared global)
+    local lastNPCWarnTime = 0
 
     function AutoFarmSystem.getElevatorPosition()
         local gs = workspace:FindFirstChild("GameSystem")
@@ -1499,9 +1545,9 @@ do
                 if not processedItems[item] and not isBlacklisted(item.Name) and item:GetAttribute("ItemDropped") ~= true and isValidLoot(item) then
                     local pos = EntityDetector.getPosition(item)
                     if pos and root then
-                        -- Check Elevator Zone Exclusion
+                        -- Check Elevator Zone Exclusion (uses CONSTANTS.THRESHOLDS)
                         local distToElev = (elevatorPos) and (pos - elevatorPos).Magnitude or 9999
-                        if distToElev <= 5 then continue end -- Accurate 5 studs (Original script)
+                        if distToElev <= CONSTANTS.THRESHOLDS.ELEVATOR_EXCLUSION then continue end
                         
                         local dist = (root.Position - pos).Magnitude
                         if dist <= radius then
@@ -1634,8 +1680,10 @@ do
                  return false
              end
              
-             if not target.object:GetAttribute("en") then
-                 warn("[PremiumCore] NPC not enabled: " .. tostring(target.name))
+             -- FIX: Only skip if 'en' is EXPLICITLY false (not nil/missing)
+             -- Original bug: `if not GetAttribute("en")` was true when en=nil, blocking ALL NPCs
+             if target.object:GetAttribute("en") == false then
+                 warn("[PremiumCore] NPC not enabled (en=false): " .. tostring(target.name))
                  processedItems[target.object] = true
                  return false
              end
@@ -1657,7 +1705,9 @@ do
              MovementEngine.teleport(offset)
              task.wait(0.2)
              
-             -- 2. Interact (Pickup) using RemoteHandler (Fixed by KILO-ZERO consensus)
+             -- 2. Interact (Pickup) using RemoteHandler
+             -- FIX: TEvent.FireRemote already wraps args in table
+             -- DO NOT double-wrap: pass raw npc, TEvent will make it {npc}
              RemoteHandler.fireFast("Interactable", target.object)
              task.wait(0.5) -- Wait for attach/pickup
              
@@ -3038,7 +3088,9 @@ AutoDungeonSection:Toggle({
     Desc = "Master switch for Auto Vote features",
     Default = false,
     Callback = function(val)
+        warn("[DEBUG] AutoDungeon Toggle Callback: val =", val)
         StateManager.set("autoDungeon", val)
+        warn("[DEBUG] AutoDungeon State after set:", StateManager.get("autoDungeon"))
     end
 })
 
@@ -3225,7 +3277,8 @@ ActionsSection:Toggle({
                                     local pos = EntityDetector.getPosition(item)
                                     local distToElev = (pos and elevatorPos) and (pos - elevatorPos).Magnitude or 9999
                                     
-                                    if distToElev > 8 then -- Safe Radius 8 studs
+                                    -- FIX: Use CONSTANTS.THRESHOLDS for vacuum safe radius
+                                    if distToElev > CONSTANTS.THRESHOLDS.VACUUM_SAFE_RADIUS then
                                         RemoteHandler.fireFast("Interactable", item)
                                         -- Throttling to prevent instant disconnection
                                         task.wait(CONSTANTS.LOOP_INTERVALS.FAST) 
@@ -3706,7 +3759,7 @@ ConnectionPool.spawn(function()
         pcall(function()
             -- Safe mode check
             if StateManager.get("safeMode") then
-                local monsterNearby = AutoFarmSystem.isMonsterNearby(50)
+                local monsterNearby = AutoFarmSystem.isMonsterNearby(CONSTANTS.THRESHOLDS.MONSTER_SAFE_RETREAT)
                 if monsterNearby then
                     safeSetStatus("Status: <font color='#FF0000'>⚠️ Retreating (Monster)</font>")
                     -- Retreat to Elevator
@@ -3764,6 +3817,13 @@ ConnectionPool.spawn(function()
                 AutoFarmSystem.setCurrentTarget(nil)
             end
             
+            -- FIX: Invalidate NPC target if farmNPCs toggle is now OFF
+            -- This prevents cached NPC targets from persisting when user disables the toggle
+            if target and target.type == "NPC" and not StateManager.get("farmNPCs") then
+                target = nil
+                AutoFarmSystem.setCurrentTarget(nil)
+            end
+            
             -- Resets Idle Timer when working
             -- REMOVED: StateManager.set("autoDungeonIdleTime", 0) from here
             
@@ -3817,10 +3877,10 @@ ConnectionPool.spawn(function()
                     if idleStart == 0 then
                         StateManager.set("autoDungeonIdleTime", os.clock())
                         StateManager.set("autoDungeonHasVoted", false)  -- KILO Fix: Reset on new idle
-                    elseif elapsed > 5 and not StateManager.get("autoDungeonHasVoted") then  -- KILO Fix: Check flag
+                    elseif elapsed > CONSTANTS.THRESHOLDS.VOTE_IDLE_THRESHOLD and not StateManager.get("autoDungeonHasVoted") then
                         -- Check for Vote Cooldown (30s - increased from 10s)
                         local lastVote = StateManager.get("lastVoteTime") or 0
-                        if (os.clock() - lastVote) > 30 then
+                        if (os.clock() - lastVote) > CONSTANTS.THRESHOLDS.VOTE_COOLDOWN then
                             -- Get Floor Data
                             local currentFloor = 0
                             pcall(function()
@@ -3874,7 +3934,7 @@ ConnectionPool.spawn(function()
                 local isMonster = EntityDetector.isMonster(monster)
                 if isMonster then
                     local pos = EntityDetector.getPosition(monster)
-                    if pos and (root.Position - pos).Magnitude < 15 then
+                    if pos and (root.Position - pos).Magnitude < CONSTANTS.THRESHOLDS.KILL_AURA_RANGE then
                         RemoteHandler.fire("Interactable", monster)
                     end
                 end
@@ -4075,6 +4135,14 @@ StateManager.subscribe("alive", function(value)
         MonsterTrackerAlert.destroy()
         InternalHUD.destroy()
         ElevatorHighlight.toggle(false)
+    end
+end)
+
+-- FIX: Reset vote state on floor change to prevent stale voting (Logic Fix)
+StateManager.subscribe("currentFloor", function(newFloor, oldFloor)
+    if newFloor ~= oldFloor then
+        StateManager.set("autoDungeonHasVoted", false, true)  -- Silent reset
+        StateManager.set("autoDungeonIdleTime", 0, true)
     end
 end)
 

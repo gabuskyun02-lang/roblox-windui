@@ -8,7 +8,20 @@ local New = Creator.New
 
 
 local viewportPointToWorld, getOffset = unpack(require("./Utils"))
-local BlurFolder = Instance.new("Folder", cloneref(game:GetService("Workspace")).CurrentCamera)
+
+-- FIX: Lazy-initialize BlurFolder to avoid nil camera errors during module load
+local BlurFolder = nil
+local function getBlurFolder()
+	if not BlurFolder then
+		local camera = cloneref(game:GetService("Workspace")).CurrentCamera
+		if camera then
+			BlurFolder = Instance.new("Folder")
+			BlurFolder.Name = "WindUI Acrylic"
+			BlurFolder.Parent = camera
+		end
+	end
+	return BlurFolder
+end
 
 
 local function createAcrylic()
@@ -43,7 +56,10 @@ local function createAcrylicBlur(distance)
 		bottomRight = Vector2.new(),
 	}
 	local model = createAcrylic()
-	model.Parent = BlurFolder
+	local folder = getBlurFolder()
+	if folder then
+		model.Parent = folder
+	end
 
 	local function updatePositions(size, position)
 		positions.topLeft = position

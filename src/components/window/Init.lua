@@ -1137,7 +1137,7 @@ return function(Config)
         Window.OnDestroyCallback = func
     end
     
-    if Config.WindUI.UseAcrylic then
+    if Window.Acrylic then
 		Window.AcrylicPaint.AddParent(Window.UIElements.Main)
 	end
 
